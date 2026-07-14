@@ -184,3 +184,46 @@ html, body {
 @utility animate-firefly       { animation: firefly 8s ease-in-out infinite; }
 @utility animate-float-star    { animation: float-star 5s ease-in-out infinite; }
 @utility animate-reveal        { animation: reveal 0.9s ease-out both; }
+
+/* -------- Theme variants (Themes page) -------- */
+:root[data-theme="rose"] {
+  --primary: oklch(0.85 0.13 20);
+  --accent: oklch(0.88 0.13 320);
+  --ring: oklch(0.85 0.13 20 / 0.6);
+  --gradient-galaxy: linear-gradient(180deg, oklch(0.22 0.08 340) 0%, oklch(0.28 0.1 20) 55%, oklch(0.4 0.12 30) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.92 0.08 20), oklch(0.82 0.15 350));
+  --shadow-glow: 0 0 60px oklch(0.85 0.13 20 / 0.35);
+}
+:root[data-theme="aurora"] {
+  --primary: oklch(0.88 0.13 160);
+  --accent: oklch(0.85 0.12 240);
+  --ring: oklch(0.88 0.13 160 / 0.6);
+  --gradient-galaxy: linear-gradient(180deg, oklch(0.2 0.08 240) 0%, oklch(0.28 0.1 200) 55%, oklch(0.35 0.12 160) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.92 0.1 160), oklch(0.82 0.14 220));
+  --shadow-glow: 0 0 60px oklch(0.88 0.13 160 / 0.35);
+}
+:root[data-theme="vanilla"] {
+  --primary: oklch(0.9 0.09 70);
+  --accent: oklch(0.87 0.09 45);
+  --ring: oklch(0.9 0.09 70 / 0.6);
+  --gradient-galaxy: linear-gradient(180deg, oklch(0.25 0.05 60) 0%, oklch(0.32 0.07 50) 55%, oklch(0.42 0.09 40) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.95 0.06 70), oklch(0.85 0.12 45));
+  --shadow-glow: 0 0 60px oklch(0.9 0.09 70 / 0.4);
+}
+
+/* -------- Extra keyframes -------- */
+@keyframes constellation-draw {
+  from { stroke-dashoffset: 400; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 20px oklch(0.9 0.13 90 / 0.2); }
+  50%      { box-shadow: 0 0 40px oklch(0.9 0.13 90 / 0.5); }
+}
+@keyframes parallax-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(8px, -12px); }
+}
+@utility animate-constellation { animation: constellation-draw 2s ease-out both; }
+@utility animate-badge-glow     { animation: badge-glow 3s ease-in-out infinite; }
+@utility animate-parallax-drift { animation: parallax-drift 9s ease-in-out infinite; }

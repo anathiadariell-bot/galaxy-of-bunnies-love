@@ -1,51 +1,34 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { NightSky } from "@/components/galaxy/NightSky";
 import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { Header } from "@/components/galaxy/Header";
+import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
 import {
-  Star, Image as ImageIcon, Video, Mic, Mail, Trophy, CalendarHeart, Plus, LogOut,
+  Star as StarIcon, Image as ImageIcon, Video, Mic, Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles,
 } from "lucide-react";
-import { toast } from "sonner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useLetters, useProfile, useStars, useAuthUser } from "@/hooks/useGalaxyData";
+import { daysBetween, STAR_COLORS, type StarColor } from "@/lib/galaxy";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  head: () => ({
+    meta: [
+      { title: "Your Galaxy — Our Little Galaxy" },
+      { name: "description", content: "Your dreamy dashboard of stars, letters, and shared memories." },
+    ],
+  }),
   component: DashboardPage,
 });
-
-interface Profile {
-  display_name: string | null;
-  together_since: string | null;
-}
-
-function daysBetween(from: string | null): number {
-  if (!from) return 0;
-  const start = new Date(from).getTime();
-  return Math.max(0, Math.floor((Date.now() - start) / (1000 * 60 * 60 * 24)));
-}
 
 function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<{ id: string; email: string | null } | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setUser({ id: data.user.id, email: data.user.email ?? null });
-    });
-  }, []);
-
-  const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
-    enabled: !!user?.id,
-    queryFn: async (): Promise<Profile | null> => {
-      const { data, error } = await supabase.from("profiles").select("display_name, together_since").eq("id", user!.id).maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
+  const user = useAuthUser();
+  const { data: profile } = useProfile();
+  const { data: stars = [] } = useStars();
+  const { data: letters = [] } = useLetters();
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -55,19 +38,21 @@ function DashboardPage() {
   };
 
   const stats = [
-    { label: "Stars", value: 0, icon: Star, color: "oklch(0.9 0.13 90)" },
-    { label: "Photos", value: 0, icon: ImageIcon, color: "oklch(0.85 0.1 240)" },
-    { label: "Videos", value: 0, icon: Video, color: "oklch(0.85 0.12 320)" },
-    { label: "Voice Memories", value: 0, icon: Mic, color: "oklch(0.87 0.11 160)" },
-    { label: "Letters", value: 0, icon: Mail, color: "oklch(0.87 0.05 20)" },
-    { label: "Achievements", value: 0, icon: Trophy, color: "oklch(0.9 0.13 90)" },
-    { label: "Days Together", value: daysBetween(profile?.together_since ?? null), icon: CalendarHeart, color: "oklch(0.85 0.1 20)" },
+    { label: "Stars", value: stars.length, icon: StarIcon, color: STAR_COLORS.gold, to: "/my-jar" as const },
+    { label: "Photos", value: 0, icon: ImageIcon, color: STAR_COLORS.sky, soon: true },
+    { label: "Videos", value: 0, icon: Video, color: STAR_COLORS.violet, soon: true },
+    { label: "Voice Memories", value: 0, icon: Mic, color: STAR_COLORS.sage, soon: true },
+    { label: "Letters", value: letters.length, icon: Mail, color: STAR_COLORS.blush, to: "/love-letters" as const },
+    { label: "Achievements", value: unlockedCount(stars.length, letters.length, daysBetween(profile?.together_since)), icon: Trophy, color: STAR_COLORS.gold, to: "/achievements" as const },
+    { label: "Days Together", value: daysBetween(profile?.together_since), icon: CalendarHeart, color: STAR_COLORS.rose, to: "/settings" as const },
   ];
 
   const firstName = profile?.display_name ?? user?.email?.split("@")[0] ?? "love";
+  const recent = stars.slice(0, 6);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      <ThemeBoot />
       <NightSky />
       <Header />
 
@@ -78,14 +63,20 @@ function DashboardPage() {
             <h1 className="font-display text-5xl text-primary text-glow sm:text-6xl">Hi, {firstName}</h1>
             <p className="mt-2 text-sm text-foreground/75">Every memory becomes a star. Add one today.</p>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => toast("Coming soon ✨", { description: "Add Star will open here." })}
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/add-star"
               className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-primary-foreground hover:scale-105 transition"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Plus className="h-4 w-4" /> Add Star
-            </button>
+            </Link>
+            <Link
+              to="/love-letters"
+              className="glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm text-foreground/90 hover:bg-white/15"
+            >
+              <PenLine className="h-4 w-4 text-accent" /> Write a Letter
+            </Link>
             <button
               onClick={signOut}
               className="glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm text-foreground/85 hover:bg-white/15"
@@ -104,7 +95,7 @@ function DashboardPage() {
           </div>
 
           <div className="flex justify-center order-1 lg:order-2 animate-reveal" style={{ animationDelay: "0.2s" }}>
-            <MemoryJar size={380} />
+            <MemoryJar size={340} />
           </div>
 
           <div className="grid grid-cols-2 gap-4 lg:gap-6 order-3">
@@ -113,6 +104,35 @@ function DashboardPage() {
             ))}
           </div>
         </div>
+
+        {/* Recent stars strip */}
+        {recent.length > 0 && (
+          <section className="mt-16 animate-reveal" style={{ animationDelay: "0.6s" }}>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="font-display text-3xl text-primary text-glow">Recent stars</h2>
+              <Link to="/my-jar" className="text-sm text-foreground/70 hover:text-primary">View all →</Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {recent.map((s) => (
+                <div key={s.id} className="glass rounded-3xl p-5 transition hover:bg-white/10">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                      style={{ background: `${STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold} / 0.15`, color: STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold }}
+                    >
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-display text-xl text-primary">{s.title}</p>
+                      <p className="text-xs text-foreground/60">{new Date(s.starred_on).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  {s.note && <p className="mt-3 line-clamp-3 text-sm text-foreground/80">{s.note}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <MusicPlayer />
@@ -120,23 +140,39 @@ function DashboardPage() {
   );
 }
 
+function unlockedCount(stars: number, letters: number, days: number): number {
+  let n = 0;
+  if (stars >= 1) n++;
+  if (stars >= 10) n++;
+  if (stars >= 50) n++;
+  if (letters >= 1) n++;
+  if (letters >= 5) n++;
+  if (days >= 100) n++;
+  if (days >= 365) n++;
+  return n;
+}
+
 function StatCard({
-  label, value, icon: Icon, color, delay = 0,
+  label, value, icon: Icon, color, delay = 0, to, soon,
 }: {
   label: string;
   value: number;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   delay?: number;
+  to?: "/my-jar" | "/love-letters" | "/achievements" | "/settings";
+  soon?: boolean;
 }) {
-  return (
-    <div
-      className="glass animate-reveal rounded-3xl p-5 transition hover:scale-[1.03] hover:bg-white/10"
-      style={{ animationDelay: `${delay}s` }}
-    >
+  const inner = (
+    <div className="glass animate-reveal relative rounded-3xl p-5 transition hover:scale-[1.03] hover:bg-white/10" style={{ animationDelay: `${delay}s` }}>
+      {soon && (
+        <span className="absolute right-3 top-3 rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-foreground/70">
+          soon
+        </span>
+      )}
       <div
         className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl"
-        style={{ background: `${color.replace(")", " / 0.15)")}`, color }}
+        style={{ background: `${color} / 0.15`, color }}
       >
         <Icon className="h-5 w-5" />
       </div>
@@ -144,4 +180,6 @@ function StatCard({
       <p className="mt-1 text-xs uppercase tracking-widest text-foreground/70">{label}</p>
     </div>
   );
+  if (to && !soon) return <Link to={to}>{inner}</Link>;
+  return inner;
 }

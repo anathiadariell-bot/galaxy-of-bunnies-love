@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      letters: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          title: string
+          unlock_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          title: string
+          unlock_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+          unlock_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -21,6 +51,7 @@ export type Database = {
           display_name: string | null
           id: string
           partner_name: string | null
+          theme: string
           together_since: string | null
           updated_at: string
         }
@@ -30,6 +61,7 @@ export type Database = {
           display_name?: string | null
           id: string
           partner_name?: string | null
+          theme?: string
           together_since?: string | null
           updated_at?: string
         }
@@ -39,8 +71,45 @@ export type Database = {
           display_name?: string | null
           id?: string
           partner_name?: string | null
+          theme?: string
           together_since?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      stars: {
+        Row: {
+          color: string
+          created_at: string
+          emotion: string
+          id: string
+          note: string | null
+          starred_on: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          emotion?: string
+          id?: string
+          note?: string | null
+          starred_on?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          emotion?: string
+          id?: string
+          note?: string | null
+          starred_on?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

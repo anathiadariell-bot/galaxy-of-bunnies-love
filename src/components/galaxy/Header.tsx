@@ -6,14 +6,15 @@ import type { User } from "@supabase/supabase-js";
 
 const NAV = [
   { label: "Home", to: "/" as const },
-  { label: "My Jar", to: "/dashboard" as const },
-  { label: "Add Star", to: "/dashboard" as const },
-  { label: "Love Letters", to: "/dashboard" as const },
-  { label: "Timeline", to: "/dashboard" as const },
-  { label: "Galaxy Mode", to: "/dashboard" as const },
-  { label: "Themes", to: "/dashboard" as const },
-  { label: "Achievements", to: "/dashboard" as const },
-  { label: "Settings", to: "/dashboard" as const },
+  { label: "My Jar", to: "/my-jar" as const },
+  { label: "Add Star", to: "/add-star" as const },
+  { label: "Love Letters", to: "/love-letters" as const },
+  { label: "Timeline", to: "/timeline" as const },
+  { label: "Galaxy Mode", to: "/galaxy-mode" as const },
+  { label: "Themes", to: "/themes" as const },
+  { label: "Achievements", to: "/achievements" as const },
+  { label: "Settings", to: "/settings" as const },
+  { label: "Account", to: "/account" as const },
 ];
 
 export function Header() {
@@ -35,11 +36,12 @@ export function Header() {
         </Link>
 
         <nav className="hidden xl:flex items-center gap-1">
-          {NAV.slice(0, 6).map((n) => (
+          {NAV.slice(1, 7).map((n) => (
             <Link
               key={n.label}
               to={n.to}
               className="rounded-full px-3 py-1.5 text-sm text-foreground/80 transition hover:bg-white/10 hover:text-primary"
+              activeProps={{ className: "bg-white/10 text-primary" }}
             >
               {n.label}
             </Link>
@@ -75,17 +77,11 @@ export function Header() {
                 to={n.to}
                 onClick={() => setOpen(false)}
                 className="rounded-2xl px-3 py-2 text-sm text-foreground/85 hover:bg-white/10 hover:text-primary"
+                activeProps={{ className: "bg-white/10 text-primary" }}
               >
                 {n.label}
               </Link>
             ))}
-            <Link
-              to={user ? "/dashboard" : "/auth"}
-              onClick={() => setOpen(false)}
-              className="col-span-2 rounded-2xl bg-primary px-3 py-2 text-center text-sm font-medium text-primary-foreground sm:col-span-3"
-            >
-              {user ? "Open Galaxy" : "Account"}
-            </Link>
           </div>
         </div>
       )}
