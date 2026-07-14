@@ -143,7 +143,13 @@ export function useUpdateProfile() {
   const qc = useQueryClient();
   const user = useAuthUser();
   return useMutation({
-    mutationFn: async (patch: Partial<Omit<Profile, "id">>) => {
+    mutationFn: async (patch: {
+      display_name?: string | null;
+      partner_name?: string | null;
+      together_since?: string | null;
+      theme?: string;
+      avatar_url?: string | null;
+    }) => {
       if (!user) throw new Error("Not signed in");
       const { data, error } = await supabase
         .from("profiles")
