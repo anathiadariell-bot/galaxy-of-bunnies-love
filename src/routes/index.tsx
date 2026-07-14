@@ -50,39 +50,69 @@ function HomePage() {
           </Link>
         </div>
 
-        {/* Jar + bunnies scene */}
-        <div className="relative mt-16 w-full max-w-5xl">
+        {/* Jar + bunnies cinematic scene */}
+        <div className="relative mt-14 w-full max-w-3xl">
+          {/* Shared ground glow — single light source uniting jar + bunnies */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-2 mx-auto h-40 w-[85%] rounded-[50%] blur-3xl opacity-70"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 60%, oklch(0.9 0.15 90 / 0.55), oklch(0.75 0.14 250 / 0.25) 45%, transparent 75%)",
+            }}
+          />
+
           <div className="relative mx-auto flex items-end justify-center">
+            {/* Her — left, tucked against jar base */}
             <img
               src={bunnyHer}
               alt=""
-              className="animate-float-y hidden sm:block absolute bottom-4 left-[10%] w-28 sm:w-36 md:w-44 lg:w-52 drop-shadow-[0_20px_30px_rgba(0,0,0,0.4)]"
-              style={{ animationDelay: "0.2s" }}
+              aria-hidden
+              className="animate-float-y absolute bottom-0 left-[10%] sm:left-[14%] z-20 w-20 sm:w-24 md:w-28 lg:w-32"
+              style={{
+                animationDelay: "0.2s",
+                filter:
+                  "brightness(0.92) contrast(1.02) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 0 18px oklch(0.9 0.15 90 / 0.35))",
+              }}
             />
-            <MemoryJar size={340} className="mx-auto sm:hidden" />
-            <div className="hidden sm:block">
-              <MemoryJar size={420} />
+
+            {/* Jar — focal point, sized down for balance */}
+            <div className="relative z-10">
+              <MemoryJar size={260} className="sm:hidden" />
+              <div className="hidden sm:block md:hidden">
+                <MemoryJar size={300} />
+              </div>
+              <div className="hidden md:block lg:hidden">
+                <MemoryJar size={340} />
+              </div>
+              <div className="hidden lg:block">
+                <MemoryJar size={360} />
+              </div>
             </div>
+
+            {/* Him — right, mirrored */}
             <img
               src={bunnyHim}
               alt=""
-              className="animate-float-y hidden sm:block absolute bottom-4 right-[10%] w-28 sm:w-36 md:w-44 lg:w-52 drop-shadow-[0_20px_30px_rgba(0,0,0,0.4)]"
-              style={{ animationDelay: "1s" }}
+              aria-hidden
+              className="animate-float-y absolute bottom-0 right-[10%] sm:right-[14%] z-20 w-20 sm:w-24 md:w-28 lg:w-32"
+              style={{
+                animationDelay: "1s",
+                filter:
+                  "brightness(0.92) contrast(1.02) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 0 18px oklch(0.85 0.1 240 / 0.35))",
+              }}
             />
           </div>
 
-          {/* Reflection */}
+          {/* Contact shadow on shared ground plane */}
           <div
             aria-hidden
-            className="mx-auto mt-2 h-20 w-3/4 rounded-full opacity-50 blur-2xl"
-            style={{ background: "radial-gradient(ellipse, oklch(0.9 0.15 90 / 0.5), transparent 70%)" }}
+            className="mx-auto mt-1 h-10 w-2/3 rounded-[50%] opacity-60 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 70%)",
+            }}
           />
-        </div>
-
-        {/* Small mobile-only bunny row */}
-        <div className="mt-6 flex w-full justify-between px-4 sm:hidden">
-          <img src={bunnyHer} alt="" className="w-24 animate-float-y" />
-          <img src={bunnyHim} alt="" className="w-24 animate-float-y" style={{ animationDelay: "1s" }} />
         </div>
       </main>
 
