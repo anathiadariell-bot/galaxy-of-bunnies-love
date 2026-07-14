@@ -13,7 +13,16 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
+import { Route as AuthenticatedThemesRouteImport } from './routes/_authenticated/themes'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedMyJarRouteImport } from './routes/_authenticated/my-jar'
+import { Route as AuthenticatedLoveLettersRouteImport } from './routes/_authenticated/love-letters'
+import { Route as AuthenticatedGalaxyModeRouteImport } from './routes/_authenticated/galaxy-mode'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAddStarRouteImport } from './routes/_authenticated/add-star'
+import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -34,9 +43,56 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedThemesRoute = AuthenticatedThemesRouteImport.update({
+  id: '/themes',
+  path: '/themes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyJarRoute = AuthenticatedMyJarRouteImport.update({
+  id: '/my-jar',
+  path: '/my-jar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoveLettersRoute =
+  AuthenticatedLoveLettersRouteImport.update({
+    id: '/love-letters',
+    path: '/love-letters',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGalaxyModeRoute = AuthenticatedGalaxyModeRouteImport.update({
+  id: '/galaxy-mode',
+  path: '/galaxy-mode',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAddStarRoute = AuthenticatedAddStarRouteImport.update({
+  id: '/add-star',
+  path: '/add-star',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAchievementsRoute =
+  AuthenticatedAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
@@ -44,13 +100,31 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/achievements': typeof AuthenticatedAchievementsRoute
+  '/add-star': typeof AuthenticatedAddStarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
+  '/love-letters': typeof AuthenticatedLoveLettersRoute
+  '/my-jar': typeof AuthenticatedMyJarRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/themes': typeof AuthenticatedThemesRoute
+  '/timeline': typeof AuthenticatedTimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/achievements': typeof AuthenticatedAchievementsRoute
+  '/add-star': typeof AuthenticatedAddStarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
+  '/love-letters': typeof AuthenticatedLoveLettersRoute
+  '/my-jar': typeof AuthenticatedMyJarRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/themes': typeof AuthenticatedThemesRoute
+  '/timeline': typeof AuthenticatedTimelineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,20 +132,64 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/add-star': typeof AuthenticatedAddStarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
+  '/_authenticated/love-letters': typeof AuthenticatedLoveLettersRoute
+  '/_authenticated/my-jar': typeof AuthenticatedMyJarRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/themes': typeof AuthenticatedThemesRoute
+  '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/sitemap.xml' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/account'
+    | '/achievements'
+    | '/add-star'
+    | '/dashboard'
+    | '/galaxy-mode'
+    | '/love-letters'
+    | '/my-jar'
+    | '/settings'
+    | '/themes'
+    | '/timeline'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/sitemap.xml' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/account'
+    | '/achievements'
+    | '/add-star'
+    | '/dashboard'
+    | '/galaxy-mode'
+    | '/love-letters'
+    | '/my-jar'
+    | '/settings'
+    | '/themes'
+    | '/timeline'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/sitemap.xml'
+    | '/_authenticated/account'
+    | '/_authenticated/achievements'
+    | '/_authenticated/add-star'
     | '/_authenticated/dashboard'
+    | '/_authenticated/galaxy-mode'
+    | '/_authenticated/love-letters'
+    | '/_authenticated/my-jar'
+    | '/_authenticated/settings'
+    | '/_authenticated/themes'
+    | '/_authenticated/timeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -111,6 +229,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/timeline': {
+      id: '/_authenticated/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof AuthenticatedTimelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/themes': {
+      id: '/_authenticated/themes'
+      path: '/themes'
+      fullPath: '/themes'
+      preLoaderRoute: typeof AuthenticatedThemesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-jar': {
+      id: '/_authenticated/my-jar'
+      path: '/my-jar'
+      fullPath: '/my-jar'
+      preLoaderRoute: typeof AuthenticatedMyJarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/love-letters': {
+      id: '/_authenticated/love-letters'
+      path: '/love-letters'
+      fullPath: '/love-letters'
+      preLoaderRoute: typeof AuthenticatedLoveLettersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/galaxy-mode': {
+      id: '/_authenticated/galaxy-mode'
+      path: '/galaxy-mode'
+      fullPath: '/galaxy-mode'
+      preLoaderRoute: typeof AuthenticatedGalaxyModeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -118,15 +278,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/add-star': {
+      id: '/_authenticated/add-star'
+      path: '/add-star'
+      fullPath: '/add-star'
+      preLoaderRoute: typeof AuthenticatedAddStarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/achievements': {
+      id: '/_authenticated/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedAddStarRoute: typeof AuthenticatedAddStarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGalaxyModeRoute: typeof AuthenticatedGalaxyModeRoute
+  AuthenticatedLoveLettersRoute: typeof AuthenticatedLoveLettersRoute
+  AuthenticatedMyJarRoute: typeof AuthenticatedMyJarRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedThemesRoute: typeof AuthenticatedThemesRoute
+  AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedAddStarRoute: AuthenticatedAddStarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGalaxyModeRoute: AuthenticatedGalaxyModeRoute,
+  AuthenticatedLoveLettersRoute: AuthenticatedLoveLettersRoute,
+  AuthenticatedMyJarRoute: AuthenticatedMyJarRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedThemesRoute: AuthenticatedThemesRoute,
+  AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
