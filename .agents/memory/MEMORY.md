@@ -1,1 +1,2 @@
 - [Lovable/TanStack Start on Replit](lovable-tanstack-start-setup.md) — port/host overrides, package manager, and known dev-only cosmetic error for this stack.
+- [Reconnecting Lovable app to user-owned Supabase](lovable-supabase-reconnect.md) — detecting Lovable-managed backends, env var naming, pooler vs direct connection, secure secret entry.
