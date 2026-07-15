@@ -1,0 +1,1 @@
+- [Lovable/TanStack Start on Replit](lovable-tanstack-start-setup.md) — port/host overrides, package manager, and known dev-only cosmetic error for this stack.

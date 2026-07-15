@@ -1,31 +1,42 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import nightSky from "@/assets/night-sky.jpg";
+
+type Star = { top: number; left: number; size: number; delay: number; duration: number };
+type Firefly = { top: number; left: number; delay: number; duration: number; size: number };
+
+function makeStars(): Star[] {
+  return Array.from({ length: 90 }).map(() => ({
+    top: Math.random() * 100,
+    left: Math.random() * 100,
+    size: Math.random() * 2.2 + 0.6,
+    delay: Math.random() * 4,
+    duration: 2.5 + Math.random() * 3,
+  }));
+}
+
+function makeFireflies(): Firefly[] {
+  return Array.from({ length: 14 }).map(() => ({
+    top: 40 + Math.random() * 55,
+    left: Math.random() * 100,
+    delay: Math.random() * 6,
+    duration: 6 + Math.random() * 6,
+    size: 3 + Math.random() * 3,
+  }));
+}
 
 /** Cinematic animated night sky background: gradient + image + twinkling stars + shooting stars + fireflies + drifting clouds. */
 export function NightSky() {
-  const stars = useMemo(
-    () =>
-      Array.from({ length: 90 }).map((_, i) => ({
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        size: Math.random() * 2.2 + 0.6,
-        delay: Math.random() * 4,
-        duration: 2.5 + Math.random() * 3,
-      })),
-    [],
-  );
+  // Random per-star positions/timings must not be computed during SSR: the server and
+  // client would each roll different random values and React would fail to hydrate the
+  // tree (visible as console hydration errors and a full client-side re-render on every
+  // load). Generating them client-side only, after mount, keeps SSR markup random-free.
+  const [stars, setStars] = useState<Star[]>([]);
+  const [fireflies, setFireflies] = useState<Firefly[]>([]);
 
-  const fireflies = useMemo(
-    () =>
-      Array.from({ length: 14 }).map(() => ({
-        top: 40 + Math.random() * 55,
-        left: Math.random() * 100,
-        delay: Math.random() * 6,
-        duration: 6 + Math.random() * 6,
-        size: 3 + Math.random() * 3,
-      })),
-    [],
-  );
+  useEffect(() => {
+    setStars(makeStars());
+    setFireflies(makeFireflies());
+  }, []);
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">

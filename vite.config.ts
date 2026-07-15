@@ -12,4 +12,14 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Replit's preview proxy serves the app on port 5000 from an iframe on a
+  // different origin, so the dev server must bind 0.0.0.0:5000 and accept any host.
+  vite: {
+    server: {
+      host: "0.0.0.0",
+      port: 5000,
+      strictPort: true,
+      allowedHosts: true,
+    },
+  },
 });
