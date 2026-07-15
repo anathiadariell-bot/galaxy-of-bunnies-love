@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { NightSky } from "@/components/galaxy/NightSky";
 import { Sparkles, Mail, Lock, User as UserIcon, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -29,21 +28,37 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
             data: { display_name: displayName },
           },
         });
         if (error) throw error;
-        toast.success("Welcome to your little galaxy ✨");
+
+        if (data.session) {
+          // Email confirmation is off for this project — the user is signed in immediately.
+          toast.success("Welcome to your little galaxy ✨");
+          navigate({ to: "/dashboard", replace: true });
+        } else {
+          // Email confirmation is required before a session can be created. Don't navigate
+          // to a protected route yet — there's no session, so it would just bounce back here.
+          toast.success("Check your email to confirm your account, then sign in.");
+          setMode("login");
+          setPassword("");
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          if (error.code === "email_not_confirmed") {
+            throw new Error("Please confirm your email address first — check your inbox for the confirmation link.");
+          }
+          throw error;
+        }
+        if (data.session) navigate({ to: "/dashboard", replace: true });
       }
-      navigate({ to: "/dashboard", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -53,14 +68,19 @@ function AuthPage() {
 
   const oauth = async (provider: "google" | "apple") => {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
-    if (result.error) {
-      toast.error(result.error.message);
+    // Sign in directly through Supabase's own OAuth flow (redirects the browser to Supabase's
+    // hosted /authorize endpoint, then on to the provider). Do not route this through Lovable's
+    // cloud-auth-js broker (`/~oauth/initiate`) — that endpoint only exists on Lovable's own
+    // hosting, so on Replit (or any other host) it 404s.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (error) {
+      toast.error(error.message);
       setLoading(false);
-      return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/dashboard", replace: true });
+    // On success the browser navigates away to the provider immediately; nothing left to do here.
   };
 
   return (
