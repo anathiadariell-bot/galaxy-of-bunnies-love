@@ -5,95 +5,126 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Dancing Script", "Great Vibes", cursive;
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  /* ── Typography ── */
+  --font-display: "Pixelify Sans", cursive;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 16px);
+  /* ── Radius scale (softer-pixel: 8px base) ── */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+  --radius-2xl: calc(var(--radius) + 14px);
+  --radius-3xl: calc(var(--radius) + 22px);
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
+  /* ── Semantic color aliases → CSS vars ── */
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
+  --color-primary:            var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
+  --color-secondary:          var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
 
+  /* ── Cozy Pixel Edition palette tokens ── */
+  --color-pixel-navy:   var(--pixel-navy);
+  --color-pixel-coffee: var(--pixel-coffee);
+  --color-pixel-beige:  var(--pixel-beige);
+  --color-pixel-pink:   var(--pixel-pink);
+  --color-pixel-olive:  var(--pixel-olive);
+  --color-pixel-gold:   var(--pixel-gold);
+
+  /* ── Legacy galaxy aliases (keeps existing components working) ── */
   --color-galaxy-cream: var(--galaxy-cream);
-  --color-galaxy-gold: var(--galaxy-gold);
-  --color-galaxy-sky: var(--galaxy-sky);
-  --color-galaxy-sage: var(--galaxy-sage);
+  --color-galaxy-gold:  var(--galaxy-gold);
+  --color-galaxy-sky:   var(--galaxy-sky);
+  --color-galaxy-sage:  var(--galaxy-sage);
   --color-galaxy-blush: var(--galaxy-blush);
   --color-galaxy-night: var(--galaxy-night);
-  --color-galaxy-plum: var(--galaxy-plum);
+  --color-galaxy-plum:  var(--galaxy-plum);
 
-  --shadow-glow: 0 0 60px oklch(0.85 0.12 85 / 0.35);
-  --shadow-glow-soft: 0 0 40px oklch(0.85 0.12 85 / 0.2);
-  --shadow-glass: 0 8px 32px oklch(0.15 0.05 280 / 0.5), inset 0 1px 0 oklch(1 0 0 / 0.15);
+  /* ── Shadows ── */
+  --shadow-pixel:      3px 3px 0px oklch(0.08 0.03 255);
+  --shadow-pixel-sm:   2px 2px 0px oklch(0.08 0.03 255);
+  --shadow-pixel-gold: 3px 3px 0px oklch(0.50 0.12 82);
+  --shadow-pixel-pink: 3px 3px 0px oklch(0.42 0.09 8);
+  --shadow-glow:       0 0 40px oklch(0.86 0.13 82 / 0.3);
+  --shadow-glow-soft:  0 0 24px oklch(0.86 0.13 82 / 0.15);
+  --shadow-glass:      3px 3px 0px oklch(0.08 0.03 255 / 0.55), inset 0 1px 0 oklch(0.93 0.04 78 / 0.08);
 
-  --gradient-galaxy: linear-gradient(180deg, oklch(0.18 0.06 285) 0%, oklch(0.22 0.08 300) 55%, oklch(0.32 0.09 320) 100%);
-  --gradient-star: linear-gradient(135deg, oklch(0.95 0.08 85), oklch(0.85 0.15 60));
-  --gradient-primary: linear-gradient(135deg, oklch(0.92 0.06 85), oklch(0.82 0.12 60));
+  /* ── Gradients ── */
+  --gradient-galaxy:  linear-gradient(180deg, oklch(0.13 0.04 255) 0%, oklch(0.17 0.05 262) 55%, oklch(0.22 0.06 278) 100%);
+  --gradient-star:    linear-gradient(135deg, oklch(0.93 0.04 78), oklch(0.86 0.13 82));
+  --gradient-primary: linear-gradient(135deg, oklch(0.90 0.11 84), oklch(0.80 0.16 70));
+  --gradient-coffee:  linear-gradient(135deg, oklch(0.27 0.06 45), oklch(0.33 0.07 50));
 }
 
+/* ────────────────────────────────────────────
+   Root: Cozy Pixel Edition tokens
+──────────────────────────────────────────── */
 :root {
-  --radius: 1.25rem;
+  --radius: 0.5rem; /* 8px — soft rounded-pixel feel */
 
-  /* Palette from brand: cream, gold, sky, sage, blush, night, plum */
-  --galaxy-cream: oklch(0.97 0.02 90);      /* #FFF2E1 */
-  --galaxy-gold:  oklch(0.9 0.13 90);       /* #FFE4B5 */
-  --galaxy-sky:   oklch(0.9 0.05 240);      /* #BFE7FF */
-  --galaxy-sage:  oklch(0.85 0.05 160);     /* #A7D6CB */
-  --galaxy-blush: oklch(0.87 0.05 20);      /* #FFBBCB */
-  --galaxy-night: oklch(0.2 0.04 285);      /* #1E1B2E */
-  --galaxy-plum:  oklch(0.28 0.06 300);     /* #2E2A47 */
+  /* Named palette */
+  --pixel-navy:   oklch(0.15 0.04 255); /* Warm Night Navy   */
+  --pixel-coffee: oklch(0.27 0.06 45);  /* Cozy Coffee Brown */
+  --pixel-beige:  oklch(0.93 0.04 78);  /* Warm Beige        */
+  --pixel-pink:   oklch(0.74 0.09 8);   /* Dusty Pink        */
+  --pixel-olive:  oklch(0.66 0.08 132); /* Soft Olive        */
+  --pixel-gold:   oklch(0.86 0.13 82);  /* Golden Stars      */
 
-  --background: oklch(0.18 0.06 285);
-  --foreground: oklch(0.97 0.02 90);
+  /* Legacy galaxy aliases → remapped to warm pixel palette */
+  --galaxy-cream: oklch(0.93 0.04 78);  /* → Warm Beige        */
+  --galaxy-gold:  oklch(0.86 0.13 82);  /* → Golden Stars      */
+  --galaxy-sky:   oklch(0.66 0.08 132); /* → Soft Olive        */
+  --galaxy-sage:  oklch(0.66 0.08 132); /* → Soft Olive        */
+  --galaxy-blush: oklch(0.74 0.09 8);   /* → Dusty Pink        */
+  --galaxy-night: oklch(0.15 0.04 255); /* → Warm Night Navy   */
+  --galaxy-plum:  oklch(0.27 0.06 45);  /* → Cozy Coffee Brown */
 
-  --card: oklch(1 0 0 / 0.06);
-  --card-foreground: oklch(0.97 0.02 90);
+  /* Semantic tokens */
+  --background:           oklch(0.15 0.04 255);
+  --foreground:           oklch(0.93 0.04 78);
 
-  --popover: oklch(0.22 0.07 295);
-  --popover-foreground: oklch(0.97 0.02 90);
+  --card:                 oklch(0.27 0.06 45 / 0.7);
+  --card-foreground:      oklch(0.93 0.04 78);
 
-  --primary: oklch(0.9 0.13 90);
-  --primary-foreground: oklch(0.22 0.06 290);
+  --popover:              oklch(0.21 0.05 258);
+  --popover-foreground:   oklch(0.93 0.04 78);
 
-  --secondary: oklch(1 0 0 / 0.08);
-  --secondary-foreground: oklch(0.97 0.02 90);
+  --primary:              oklch(0.86 0.13 82);
+  --primary-foreground:   oklch(0.14 0.04 255);
 
-  --muted: oklch(1 0 0 / 0.06);
-  --muted-foreground: oklch(0.82 0.03 90 / 0.75);
+  --secondary:            oklch(0.27 0.06 45);
+  --secondary-foreground: oklch(0.93 0.04 78);
 
-  --accent: oklch(0.87 0.05 20);
-  --accent-foreground: oklch(0.22 0.06 290);
+  --muted:                oklch(0.23 0.05 258 / 0.7);
+  --muted-foreground:     oklch(0.80 0.03 78 / 0.7);
 
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0.02 90);
+  --accent:               oklch(0.74 0.09 8);
+  --accent-foreground:    oklch(0.93 0.04 78);
 
-  --border: oklch(1 0 0 / 0.12);
-  --input: oklch(1 0 0 / 0.1);
-  --ring: oklch(0.9 0.13 90 / 0.6);
+  --destructive:          oklch(0.60 0.22 25);
+  --destructive-foreground: oklch(0.93 0.04 78);
+
+  --border:               oklch(0.86 0.13 82 / 0.22);
+  --input:                oklch(0.27 0.06 45 / 0.55);
+  --ring:                 oklch(0.86 0.13 82 / 0.5);
 }
 
-/* Force dreamy dark aesthetic everywhere; no light mode toggle */
+/* ── Base styles ── */
 html, body {
   background: var(--gradient-galaxy);
   color: var(--foreground);
@@ -104,30 +135,77 @@ html, body {
 @layer base {
   * { border-color: var(--color-border); }
   body { background-color: var(--color-background); color: var(--color-foreground); }
-  h1, h2, h3, .font-display { font-family: var(--font-display); font-weight: 500; letter-spacing: 0.01em; }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
 }
 
-/* -------- Utility layer: glassmorphism, glow, shimmer -------- */
+/* ════════════════════════════════════════════
+   Utility layer
+════════════════════════════════════════════ */
+
+/* ── Glassmorphism (warm-tinted) ── */
 @utility glass {
-  background: color-mix(in oklab, white 6%, transparent);
-  backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid color-mix(in oklab, white 14%, transparent);
+  background: color-mix(in oklab, oklch(0.27 0.06 45) 30%, transparent);
+  backdrop-filter: blur(10px) saturate(130%);
+  border: 2px solid oklch(0.86 0.13 82 / 0.18);
   box-shadow: var(--shadow-glass);
 }
 @utility glass-strong {
-  background: color-mix(in oklab, white 10%, transparent);
-  backdrop-filter: blur(28px) saturate(150%);
-  border: 1px solid color-mix(in oklab, white 18%, transparent);
+  background: color-mix(in oklab, oklch(0.27 0.06 45) 48%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 2px solid oklch(0.86 0.13 82 / 0.26);
   box-shadow: var(--shadow-glass);
 }
+
+/* ── Pixel-art cozy shadows ── */
+@utility pixel-shadow {
+  box-shadow: var(--shadow-pixel);
+}
+@utility pixel-shadow-sm {
+  box-shadow: var(--shadow-pixel-sm);
+}
+@utility pixel-shadow-gold {
+  box-shadow: var(--shadow-pixel-gold);
+}
+@utility pixel-shadow-pink {
+  box-shadow: var(--shadow-pixel-pink);
+}
+
+/* ── Cozy pixel card surface ── */
+@utility cozy-card {
+  background: color-mix(in oklab, oklch(0.27 0.06 45) 62%, transparent);
+  border: 2px solid oklch(0.86 0.13 82 / 0.22);
+  box-shadow: 3px 3px 0px oklch(0.08 0.03 255 / 0.75), inset 0 1px 0 oklch(0.93 0.04 78 / 0.07);
+}
+
+/* ── Cozy opaque panel ── */
+@utility cozy-panel {
+  background: color-mix(in oklab, oklch(0.19 0.05 258) 90%, transparent);
+  border: 2px solid oklch(0.86 0.13 82 / 0.18);
+  box-shadow: 3px 3px 0px oklch(0.08 0.03 255);
+}
+
+/* ── Pixel border only ── */
+@utility pixel-border {
+  border: 2px solid oklch(0.86 0.13 82 / 0.3);
+}
+
+/* ── Glow text ── */
 @utility text-glow {
-  text-shadow: 0 0 24px oklch(0.9 0.13 90 / 0.55), 0 0 60px oklch(0.9 0.13 90 / 0.25);
+  text-shadow:
+    0 0 20px oklch(0.86 0.13 82 / 0.5),
+    0 0 50px oklch(0.86 0.13 82 / 0.22);
 }
 @utility glow {
   box-shadow: var(--shadow-glow);
 }
 
-/* -------- Keyframes -------- */
+/* ════════════════════════════════════════════
+   Keyframes (all retained + warm-adapted)
+════════════════════════════════════════════ */
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; transform: scale(0.8); }
   50%      { opacity: 1;   transform: scale(1.1); }
@@ -150,7 +228,7 @@ html, body {
   50%      { transform: translateY(-18px) rotate(0.5deg); }
 }
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.55; transform: scale(1); filter: blur(30px); }
+  0%, 100% { opacity: 0.55; transform: scale(1);    filter: blur(30px); }
   50%      { opacity: 1;    transform: scale(1.08); filter: blur(40px); }
 }
 @keyframes shooting-star {
@@ -159,71 +237,83 @@ html, body {
   100% { transform: translate3d(120vw, 40vh, 0) rotate(-20deg); opacity: 0; }
 }
 @keyframes firefly {
-  0%   { transform: translate(0,0); opacity: 0.2; }
+  0%   { transform: translate(0, 0);        opacity: 0.2; }
   25%  { transform: translate(30px, -40px); opacity: 1; }
-  50%  { transform: translate(-20px, -80px); opacity: 0.6; }
+  50%  { transform: translate(-20px,-80px); opacity: 0.6; }
   75%  { transform: translate(40px, -30px); opacity: 1; }
-  100% { transform: translate(0,0); opacity: 0.2; }
+  100% { transform: translate(0, 0);        opacity: 0.2; }
 }
 @keyframes float-star {
-  0%,100% { transform: translate(0,0) rotate(0deg); }
-  50%     { transform: translate(6px,-10px) rotate(8deg); }
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50%      { transform: translate(6px, -10px) rotate(8deg); }
 }
 @keyframes reveal {
   0%   { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
-
-@utility animate-twinkle       { animation: twinkle 3.5s ease-in-out infinite; }
-@utility animate-drift         { animation: drift 60s ease-in-out infinite alternate; }
-@utility animate-drift-slow    { animation: drift-slow 90s ease-in-out infinite; }
-@utility animate-float-y       { animation: float-y 6s ease-in-out infinite; }
-@utility animate-float-jar     { animation: float-jar 7s ease-in-out infinite; }
-@utility animate-pulse-glow    { animation: pulse-glow 5s ease-in-out infinite; }
-@utility animate-shooting-star { animation: shooting-star 6s linear infinite; }
-@utility animate-firefly       { animation: firefly 8s ease-in-out infinite; }
-@utility animate-float-star    { animation: float-star 5s ease-in-out infinite; }
-@utility animate-reveal        { animation: reveal 0.9s ease-out both; }
-
-/* -------- Theme variants (Themes page) -------- */
-:root[data-theme="rose"] {
-  --primary: oklch(0.85 0.13 20);
-  --accent: oklch(0.88 0.13 320);
-  --ring: oklch(0.85 0.13 20 / 0.6);
-  --gradient-galaxy: linear-gradient(180deg, oklch(0.22 0.08 340) 0%, oklch(0.28 0.1 20) 55%, oklch(0.4 0.12 30) 100%);
-  --gradient-primary: linear-gradient(135deg, oklch(0.92 0.08 20), oklch(0.82 0.15 350));
-  --shadow-glow: 0 0 60px oklch(0.85 0.13 20 / 0.35);
+@keyframes pixel-pop {
+  0%   { transform: scale(0.94) translateY(4px); opacity: 0; }
+  60%  { transform: scale(1.03) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
-:root[data-theme="aurora"] {
-  --primary: oklch(0.88 0.13 160);
-  --accent: oklch(0.85 0.12 240);
-  --ring: oklch(0.88 0.13 160 / 0.6);
-  --gradient-galaxy: linear-gradient(180deg, oklch(0.2 0.08 240) 0%, oklch(0.28 0.1 200) 55%, oklch(0.35 0.12 160) 100%);
-  --gradient-primary: linear-gradient(135deg, oklch(0.92 0.1 160), oklch(0.82 0.14 220));
-  --shadow-glow: 0 0 60px oklch(0.88 0.13 160 / 0.35);
-}
-:root[data-theme="vanilla"] {
-  --primary: oklch(0.9 0.09 70);
-  --accent: oklch(0.87 0.09 45);
-  --ring: oklch(0.9 0.09 70 / 0.6);
-  --gradient-galaxy: linear-gradient(180deg, oklch(0.25 0.05 60) 0%, oklch(0.32 0.07 50) 55%, oklch(0.42 0.09 40) 100%);
-  --gradient-primary: linear-gradient(135deg, oklch(0.95 0.06 70), oklch(0.85 0.12 45));
-  --shadow-glow: 0 0 60px oklch(0.9 0.09 70 / 0.4);
-}
-
-/* -------- Extra keyframes -------- */
 @keyframes constellation-draw {
   from { stroke-dashoffset: 400; }
   to   { stroke-dashoffset: 0; }
 }
 @keyframes badge-glow {
-  0%, 100% { box-shadow: 0 0 20px oklch(0.9 0.13 90 / 0.2); }
-  50%      { box-shadow: 0 0 40px oklch(0.9 0.13 90 / 0.5); }
+  0%, 100% { box-shadow: 0 0 16px oklch(0.86 0.13 82 / 0.2); }
+  50%      { box-shadow: 0 0 32px oklch(0.86 0.13 82 / 0.5); }
 }
 @keyframes parallax-drift {
   0%, 100% { transform: translate(0, 0); }
   50%      { transform: translate(8px, -12px); }
 }
-@utility animate-constellation { animation: constellation-draw 2s ease-out both; }
+
+@utility animate-twinkle        { animation: twinkle 3.5s ease-in-out infinite; }
+@utility animate-drift          { animation: drift 60s ease-in-out infinite alternate; }
+@utility animate-drift-slow     { animation: drift-slow 90s ease-in-out infinite; }
+@utility animate-float-y        { animation: float-y 6s ease-in-out infinite; }
+@utility animate-float-jar      { animation: float-jar 7s ease-in-out infinite; }
+@utility animate-pulse-glow     { animation: pulse-glow 5s ease-in-out infinite; }
+@utility animate-shooting-star  { animation: shooting-star 6s linear infinite; }
+@utility animate-firefly        { animation: firefly 8s ease-in-out infinite; }
+@utility animate-float-star     { animation: float-star 5s ease-in-out infinite; }
+@utility animate-reveal         { animation: reveal 0.9s ease-out both; }
+@utility animate-pixel-pop      { animation: pixel-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+@utility animate-constellation  { animation: constellation-draw 2s ease-out both; }
 @utility animate-badge-glow     { animation: badge-glow 3s ease-in-out infinite; }
 @utility animate-parallax-drift { animation: parallax-drift 9s ease-in-out infinite; }
+
+/* ════════════════════════════════════════════
+   Theme variants
+════════════════════════════════════════════ */
+:root[data-theme="rose"] {
+  --primary:          oklch(0.80 0.14 8);
+  --accent:           oklch(0.72 0.12 340);
+  --ring:             oklch(0.80 0.14 8 / 0.5);
+  --border:           oklch(0.80 0.14 8 / 0.22);
+  --gradient-galaxy:  linear-gradient(180deg, oklch(0.16 0.05 340) 0%, oklch(0.20 0.07 10) 55%, oklch(0.26 0.09 20) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.88 0.10 8), oklch(0.78 0.16 350));
+  --shadow-glow:      0 0 40px oklch(0.80 0.14 8 / 0.35);
+  --shadow-pixel-gold: 3px 3px 0px oklch(0.45 0.12 8);
+}
+:root[data-theme="aurora"] {
+  --primary:          oklch(0.82 0.14 152);
+  --accent:           oklch(0.76 0.12 240);
+  --ring:             oklch(0.82 0.14 152 / 0.5);
+  --border:           oklch(0.82 0.14 152 / 0.22);
+  --gradient-galaxy:  linear-gradient(180deg, oklch(0.14 0.05 240) 0%, oklch(0.19 0.07 210) 55%, oklch(0.24 0.09 170) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.90 0.11 152), oklch(0.80 0.15 220));
+  --shadow-glow:      0 0 40px oklch(0.82 0.14 152 / 0.35);
+  --shadow-pixel-gold: 3px 3px 0px oklch(0.44 0.12 152);
+}
+:root[data-theme="vanilla"] {
+  --primary:          oklch(0.88 0.10 72);
+  --accent:           oklch(0.80 0.10 48);
+  --ring:             oklch(0.88 0.10 72 / 0.5);
+  --border:           oklch(0.88 0.10 72 / 0.22);
+  --gradient-galaxy:  linear-gradient(180deg, oklch(0.18 0.05 60) 0%, oklch(0.24 0.07 52) 55%, oklch(0.30 0.09 42) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.94 0.07 72), oklch(0.84 0.13 50));
+  --shadow-glow:      0 0 40px oklch(0.88 0.10 72 / 0.4);
+  --shadow-pixel-gold: 3px 3px 0px oklch(0.52 0.10 72);
+}
