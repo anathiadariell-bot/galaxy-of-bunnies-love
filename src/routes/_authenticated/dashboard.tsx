@@ -4,8 +4,8 @@ import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { Header } from "@/components/galaxy/Header";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
-import bunnyHer from "@/assets/bunny-her.png";
-import bunnyHim from "@/assets/bunny-him.png";
+import bunnyHer from "@/assets/bunny-her-pixel.png";
+import bunnyHim from "@/assets/bunny-him-pixel.png";
 import {
   Star as StarIcon, Image as ImageIcon, Video, Mic,
   Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles,
@@ -86,9 +86,8 @@ function DashboardPage() {
               className="animate-bunny-idle relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0"
               style={{
                 animationDelay: "0.3s",
+                imageRendering: "pixelated",
                 filter: [
-                  "contrast(1.08)",
-                  "saturate(1.15)",
                   "drop-shadow(3px 3px 0px oklch(0.08 0.03 255 / 0.80))",
                   "drop-shadow(0 0 18px oklch(0.90 0.15 78 / 0.45))",
                   "drop-shadow(0 0 8px oklch(0.74 0.09 8 / 0.28))",
@@ -152,9 +151,8 @@ function DashboardPage() {
               className="animate-bunny-idle-r relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0"
               style={{
                 animationDelay: "1.1s",
+                imageRendering: "pixelated",
                 filter: [
-                  "contrast(1.08)",
-                  "saturate(1.12)",
                   "drop-shadow(3px 3px 0px oklch(0.08 0.03 255 / 0.80))",
                   "drop-shadow(0 0 18px oklch(0.90 0.15 78 / 0.40))",
                   "drop-shadow(0 0 8px oklch(0.66 0.12 240 / 0.28))",

@@ -6,8 +6,8 @@ import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { Header } from "@/components/galaxy/Header";
 import { supabase } from "@/integrations/supabase/client";
-import bunnyHer from "@/assets/bunny-her.png";
-import bunnyHim from "@/assets/bunny-him.png";
+import bunnyHer from "@/assets/bunny-her-pixel.png";
+import bunnyHim from "@/assets/bunny-him-pixel.png";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -93,10 +93,9 @@ function HomePage() {
               className="animate-bunny-idle absolute bottom-0 left-[4%] sm:left-[8%] md:left-[10%] z-20 w-32 sm:w-36 md:w-44 lg:w-48"
               style={{
                 animationDelay: "0s",
+                imageRendering: "pixelated",
                 filter: [
-                  "contrast(1.08)",
-                  "saturate(1.15)",
-                  /* pixel-art hard ground shadow */
+                  /* crisp pixel-art ground shadow */
                   "drop-shadow(4px 4px 0px oklch(0.08 0.03 255 / 0.85))",
                   /* warm candlelight halo */
                   "drop-shadow(0 0 22px oklch(0.90 0.15 78 / 0.50))",
@@ -128,10 +127,9 @@ function HomePage() {
               className="animate-bunny-idle-r absolute bottom-0 right-[4%] sm:right-[8%] md:right-[10%] z-20 w-32 sm:w-36 md:w-44 lg:w-48"
               style={{
                 animationDelay: "0.9s",
+                imageRendering: "pixelated",
                 filter: [
-                  "contrast(1.08)",
-                  "saturate(1.12)",
-                  /* pixel-art hard ground shadow */
+                  /* crisp pixel-art ground shadow */
                   "drop-shadow(4px 4px 0px oklch(0.08 0.03 255 / 0.85))",
                   /* warm candlelight halo */
                   "drop-shadow(0 0 22px oklch(0.90 0.15 78 / 0.45))",
