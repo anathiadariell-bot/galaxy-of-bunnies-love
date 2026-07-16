@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
 import { NightSky } from "@/components/galaxy/NightSky";
 import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { Header } from "@/components/galaxy/Header";
+import { supabase } from "@/integrations/supabase/client";
 import bunnyHer from "@/assets/bunny-her.png";
 import bunnyHim from "@/assets/bunny-him.png";
 
@@ -12,6 +14,25 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  // Resolve session from localStorage (no network call, same as _authenticated/route.tsx).
+  // null = not yet resolved; false = no session; true = has session.
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setLoggedIn(!!session);
+    });
+    // Keep in sync if auth state changes while the page is open.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLoggedIn(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Before session is resolved, default to /auth (safe fallback; resolves in <1 frame).
+  const enterTo   = loggedIn ? "/dashboard" : "/auth";
+  const beginTo   = loggedIn ? "/add-star"  : "/auth";
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       <NightSky />
@@ -34,7 +55,7 @@ function HomePage() {
 
         <div className="animate-reveal mt-10 flex flex-col items-center gap-3 sm:flex-row" style={{ animationDelay: "0.55s" }}>
           <Link
-            to="/auth"
+            to={enterTo}
             className="group relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-medium text-primary-foreground shadow-lg transition-all hover:scale-105"
             style={{ background: "var(--gradient-primary)" }}
           >
@@ -42,7 +63,7 @@ function HomePage() {
             Enter Our Galaxy
           </Link>
           <Link
-            to="/auth"
+            to={beginTo}
             className="inline-flex items-center gap-2 rounded-full glass px-7 py-3 text-sm text-foreground/90 transition hover:bg-white/15"
           >
             <Heart className="h-4 w-4 text-accent" />
