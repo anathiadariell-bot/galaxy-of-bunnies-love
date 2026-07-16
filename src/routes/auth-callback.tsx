@@ -25,19 +25,19 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     // ── TEMPORARY DIAGNOSTICS — remove after debugging ──────────────────────
-    console.log('[auth-callback] URL on mount:', window.location.href);
+    console.error('[auth-callback] URL on mount:', window.location.href);
     const urlParams = new URLSearchParams(window.location.search);
-    console.log('[auth-callback] ?code present:', urlParams.has('code'));
-    console.log('[auth-callback] ?error:', urlParams.get('error'));
-    console.log('[auth-callback] ?error_description:', urlParams.get('error_description'));
-    console.log('[auth-callback] code-verifier in localStorage:',
+    console.error('[auth-callback] ?code present:', urlParams.has('code'));
+    console.error('[auth-callback] ?error:', urlParams.get('error'));
+    console.error('[auth-callback] ?error_description:', urlParams.get('error_description'));
+    console.error('[auth-callback] code-verifier in localStorage:',
       localStorage.getItem('supabase.auth.token-code-verifier'));
 
     // Explicitly call exchangeCodeForSession to surface the exact error.
     const code = urlParams.get('code');
     if (code) {
       supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
-        console.log('[auth-callback] exchangeCodeForSession result — error:', error, 'session:', data?.session?.user?.email ?? null);
+        console.error('[auth-callback] exchangeCodeForSession result — error:', error, 'session:', data?.session?.user?.email ?? null);
       });
     }
     // ── END TEMPORARY DIAGNOSTICS ────────────────────────────────────────────
