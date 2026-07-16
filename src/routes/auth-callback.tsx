@@ -27,12 +27,18 @@ function AuthCallbackPage() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+        // SIGNED_IN  — normal path: code exchange completed after we subscribed.
+        // INITIAL_SESSION with a session — code exchange completed before we
+        //   subscribed (root layout registered its listener first); supabase-js
+        //   won't re-fire SIGNED_IN, so we catch the already-valid session here.
         subscription.unsubscribe();
+        clearTimeout(timeout);
         navigate({ to: "/dashboard", replace: true });
       } else if (event === "SIGNED_OUT") {
         // Explicit sign-out during the callback — something went wrong.
         subscription.unsubscribe();
+        clearTimeout(timeout);
         navigate({ to: "/auth", replace: true });
       }
       // INITIAL_SESSION with null is normal while the PKCE code is being exchanged.
