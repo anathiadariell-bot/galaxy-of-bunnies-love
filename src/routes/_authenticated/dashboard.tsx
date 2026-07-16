@@ -4,6 +4,8 @@ import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { Header } from "@/components/galaxy/Header";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
+import bunnyHer from "@/assets/bunny-her.png";
+import bunnyHim from "@/assets/bunny-him.png";
 import {
   Star as StarIcon, Image as ImageIcon, Video, Mic,
   Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles,
@@ -69,55 +71,98 @@ function DashboardPage() {
           <p className="font-elegant mt-3 text-lg text-foreground/60">Every memory becomes a star.</p>
         </div>
 
-        {/* ── 2. Jar on shelf ─────────────────────────── */}
+        {/* ── 2. Jar on shelf with bunnies ─────────────── */}
         <div
-          className="animate-reveal flex flex-col items-center"
+          className="animate-reveal"
           style={{ animationDelay: "0.15s" }}
         >
-          {/* Jar ambient glow on wall */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute h-56 w-72 rounded-full blur-3xl opacity-20"
-            style={{ background: "radial-gradient(ellipse, oklch(0.88 0.16 80), transparent 70%)" }}
-          />
+          <div className="flex items-end justify-center">
 
-          {/* The jar — animate-float-jar is already inside MemoryJar */}
-          <MemoryJar size={240} />
-
-          {/* Wooden shelf */}
-          <div className="relative -mt-3 w-full max-w-xs sm:max-w-sm">
-            {/* Top highlight sliver */}
-            <div
-              className="h-[3px] w-full rounded-t-sm"
-              style={{
-                background:
-                  "linear-gradient(90deg, oklch(0.48 0.09 64 / 0.25), oklch(0.62 0.10 68 / 0.65) 35%, oklch(0.55 0.09 65 / 0.45) 70%, oklch(0.45 0.08 60 / 0.22))",
-              }}
-            />
-            {/* Shelf body */}
-            <div
-              className="h-6 w-full"
-              style={{
-                background:
-                  "linear-gradient(180deg, oklch(0.37 0.09 54) 0%, oklch(0.29 0.08 50) 50%, oklch(0.23 0.06 46) 100%)",
-                boxShadow:
-                  "0 6px 28px oklch(0.09 0.04 40 / 0.85), inset 0 1px 0 oklch(0.52 0.08 65 / 0.30)",
-              }}
-            />
-            {/* Jar contact glow on shelf top */}
-            <div
+            {/* ── Her — left bunny, sitting beside shelf ── */}
+            <img
+              src={bunnyHer}
+              alt=""
               aria-hidden
-              className="pointer-events-none absolute top-[3px] left-1/2 h-4 w-24 -translate-x-1/2 blur-xl"
-              style={{ background: "oklch(0.90 0.15 82 / 0.45)" }}
+              className="animate-bunny-idle relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0"
+              style={{
+                animationDelay: "0.3s",
+                filter: [
+                  "contrast(1.08)",
+                  "saturate(1.15)",
+                  "drop-shadow(3px 3px 0px oklch(0.08 0.03 255 / 0.80))",
+                  "drop-shadow(0 0 18px oklch(0.90 0.15 78 / 0.45))",
+                  "drop-shadow(0 0 8px oklch(0.74 0.09 8 / 0.28))",
+                ].join(" "),
+              }}
             />
-          </div>
 
-          {/* Drop shadow below shelf */}
-          <div
-            aria-hidden
-            className="-mt-1 h-8 w-3/4 blur-xl opacity-50"
-            style={{ background: "radial-gradient(ellipse, oklch(0.08 0.03 40), transparent 70%)" }}
-          />
+            {/* ── Centre: jar + shelf ── */}
+            <div className="relative z-20 flex flex-col items-center">
+              {/* Jar ambient glow on wall */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute h-56 w-72 rounded-full blur-3xl opacity-20"
+                style={{ background: "radial-gradient(ellipse, oklch(0.88 0.16 80), transparent 70%)" }}
+              />
+
+              {/* The jar — animate-float-jar is already inside MemoryJar */}
+              <MemoryJar size={240} />
+
+              {/* Wooden shelf */}
+              <div className="relative -mt-3 w-full max-w-xs sm:max-w-sm">
+                {/* Top highlight sliver */}
+                <div
+                  className="h-[3px] w-full rounded-t-sm"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, oklch(0.48 0.09 64 / 0.25), oklch(0.62 0.10 68 / 0.65) 35%, oklch(0.55 0.09 65 / 0.45) 70%, oklch(0.45 0.08 60 / 0.22))",
+                  }}
+                />
+                {/* Shelf body */}
+                <div
+                  className="h-6 w-full"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, oklch(0.37 0.09 54) 0%, oklch(0.29 0.08 50) 50%, oklch(0.23 0.06 46) 100%)",
+                    boxShadow:
+                      "0 6px 28px oklch(0.09 0.04 40 / 0.85), inset 0 1px 0 oklch(0.52 0.08 65 / 0.30)",
+                  }}
+                />
+                {/* Jar contact glow on shelf top */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute top-[3px] left-1/2 h-4 w-24 -translate-x-1/2 blur-xl"
+                  style={{ background: "oklch(0.90 0.15 82 / 0.45)" }}
+                />
+              </div>
+
+              {/* Drop shadow below shelf */}
+              <div
+                aria-hidden
+                className="-mt-1 h-8 w-3/4 blur-xl opacity-50"
+                style={{ background: "radial-gradient(ellipse, oklch(0.08 0.03 40), transparent 70%)" }}
+              />
+            </div>
+
+            {/* ── Him — right bunny, sitting beside shelf ── */}
+            <img
+              src={bunnyHim}
+              alt=""
+              aria-hidden
+              className="animate-bunny-idle-r relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0"
+              style={{
+                animationDelay: "1.1s",
+                filter: [
+                  "contrast(1.08)",
+                  "saturate(1.12)",
+                  "drop-shadow(3px 3px 0px oklch(0.08 0.03 255 / 0.80))",
+                  "drop-shadow(0 0 18px oklch(0.90 0.15 78 / 0.40))",
+                  "drop-shadow(0 0 8px oklch(0.66 0.12 240 / 0.28))",
+                ].join(" "),
+              }}
+            />
+
+          </div>
         </div>
 
         {/* ── 3. Primary stat cards ─────────────────── */}

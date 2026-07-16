@@ -85,20 +85,28 @@ function HomePage() {
           />
 
           <div className="relative mx-auto flex items-end justify-center">
-            {/* Her — left, tucked against jar base */}
+            {/* Her — left, standing beside the jar */}
             <img
               src={bunnyHer}
               alt=""
               aria-hidden
-              className="animate-float-y absolute bottom-0 left-[10%] sm:left-[14%] z-20 w-20 sm:w-24 md:w-28 lg:w-32"
+              className="animate-bunny-idle absolute bottom-0 left-[4%] sm:left-[8%] md:left-[10%] z-20 w-32 sm:w-36 md:w-44 lg:w-48"
               style={{
-                animationDelay: "0.2s",
-                filter:
-                  "brightness(0.92) contrast(1.02) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 0 18px oklch(0.9 0.15 90 / 0.35))",
+                animationDelay: "0s",
+                filter: [
+                  "contrast(1.08)",
+                  "saturate(1.15)",
+                  /* pixel-art hard ground shadow */
+                  "drop-shadow(4px 4px 0px oklch(0.08 0.03 255 / 0.85))",
+                  /* warm candlelight halo */
+                  "drop-shadow(0 0 22px oklch(0.90 0.15 78 / 0.50))",
+                  /* soft pink accent glow matching her ribbon */
+                  "drop-shadow(0 0 10px oklch(0.74 0.09 8 / 0.30))",
+                ].join(" "),
               }}
             />
 
-            {/* Jar — focal point, sized down for balance */}
+            {/* Jar — focal point, unchanged sizing */}
             <div className="relative z-10">
               <MemoryJar size={260} className="sm:hidden" />
               <div className="hidden sm:block md:hidden">
@@ -117,11 +125,19 @@ function HomePage() {
               src={bunnyHim}
               alt=""
               aria-hidden
-              className="animate-float-y absolute bottom-0 right-[10%] sm:right-[14%] z-20 w-20 sm:w-24 md:w-28 lg:w-32"
+              className="animate-bunny-idle-r absolute bottom-0 right-[4%] sm:right-[8%] md:right-[10%] z-20 w-32 sm:w-36 md:w-44 lg:w-48"
               style={{
-                animationDelay: "1s",
-                filter:
-                  "brightness(0.92) contrast(1.02) drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 0 18px oklch(0.85 0.1 240 / 0.35))",
+                animationDelay: "0.9s",
+                filter: [
+                  "contrast(1.08)",
+                  "saturate(1.12)",
+                  /* pixel-art hard ground shadow */
+                  "drop-shadow(4px 4px 0px oklch(0.08 0.03 255 / 0.85))",
+                  /* warm candlelight halo */
+                  "drop-shadow(0 0 22px oklch(0.90 0.15 78 / 0.45))",
+                  /* blue accent glow matching his scarf */
+                  "drop-shadow(0 0 10px oklch(0.66 0.12 240 / 0.30))",
+                ].join(" "),
               }}
             />
           </div>
