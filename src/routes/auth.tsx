@@ -74,7 +74,7 @@ function AuthPage() {
     // hosting, so on Replit (or any other host) it 404s.
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/auth-callback` },
     });
     if (error) {
       toast.error(error.message);
