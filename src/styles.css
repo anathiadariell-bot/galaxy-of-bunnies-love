@@ -276,6 +276,19 @@ html, body {
   0%, 100% { transform: translate(0, 0); }
   50%      { transform: translate(8px, -12px); }
 }
+@keyframes mote {
+  0%   { transform: translate(0, 0);           opacity: 0;   }
+  12%  { opacity: 0.75; }
+  45%  { transform: translate(18px, -55px);    opacity: 0.45; }
+  80%  { opacity: 0.55; }
+  100% { transform: translate(-8px, -115px);   opacity: 0;   }
+}
+@keyframes candle-flicker {
+  0%, 100% { opacity: 1;    transform: scaleX(1);    }
+  22%      { opacity: 0.82; transform: scaleX(1.04); }
+  48%      { opacity: 0.92; transform: scaleX(0.97); }
+  74%      { opacity: 0.78; transform: scaleX(1.03); }
+}
 
 @utility animate-twinkle        { animation: twinkle 3.5s ease-in-out infinite; }
 @utility animate-drift          { animation: drift 60s ease-in-out infinite alternate; }
@@ -291,6 +304,8 @@ html, body {
 @utility animate-constellation  { animation: constellation-draw 2s ease-out both; }
 @utility animate-badge-glow     { animation: badge-glow 3s ease-in-out infinite; }
 @utility animate-parallax-drift { animation: parallax-drift 9s ease-in-out infinite; }
+@utility animate-mote           { animation: mote 12s ease-in-out infinite; }
+@utility animate-candle         { animation: candle-flicker 5s ease-in-out infinite; }
 
 /* ════════════════════════════════════════════
    Theme variants

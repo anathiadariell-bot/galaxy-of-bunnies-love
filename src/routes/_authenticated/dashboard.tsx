@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { NightSky } from "@/components/galaxy/NightSky";
+import { CozyRoom } from "@/components/galaxy/CozyRoom";
 import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { Header } from "@/components/galaxy/Header";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
 import {
-  Star as StarIcon, Image as ImageIcon, Video, Mic, Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles,
+  Star as StarIcon, Image as ImageIcon, Video, Mic,
+  Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,14 +38,17 @@ function DashboardPage() {
     navigate({ to: "/auth", replace: true });
   };
 
-  const stats = [
-    { label: "Stars", value: stars.length, icon: StarIcon, color: STAR_COLORS.gold, to: "/my-jar" as const },
-    { label: "Photos", value: 0, icon: ImageIcon, color: STAR_COLORS.sky, soon: true },
-    { label: "Videos", value: 0, icon: Video, color: STAR_COLORS.violet, soon: true },
-    { label: "Voice Memories", value: 0, icon: Mic, color: STAR_COLORS.sage, soon: true },
-    { label: "Letters", value: letters.length, icon: Mail, color: STAR_COLORS.blush, to: "/love-letters" as const },
+  const primaryStats = [
+    { label: "Stars",        value: stars.length,   icon: StarIcon,     color: STAR_COLORS.gold,  to: "/my-jar"       as const },
+    { label: "Letters",      value: letters.length,  icon: Mail,         color: STAR_COLORS.blush, to: "/love-letters" as const },
     { label: "Achievements", value: unlockedCount(stars.length, letters.length, daysBetween(profile?.together_since)), icon: Trophy, color: STAR_COLORS.gold, to: "/achievements" as const },
-    { label: "Days Together", value: daysBetween(profile?.together_since), icon: CalendarHeart, color: STAR_COLORS.rose, to: "/settings" as const },
+    { label: "Days Together",value: daysBetween(profile?.together_since), icon: CalendarHeart, color: STAR_COLORS.rose, to: "/settings" as const },
+  ];
+
+  const soonStats = [
+    { label: "Photos",         value: 0, icon: ImageIcon, color: STAR_COLORS.sky,    soon: true },
+    { label: "Videos",         value: 0, icon: Video,     color: STAR_COLORS.violet, soon: true },
+    { label: "Voice Memories", value: 0, icon: Mic,       color: STAR_COLORS.sage,   soon: true },
   ];
 
   const firstName = profile?.display_name ?? user?.email?.split("@")[0] ?? "love";
@@ -53,83 +57,162 @@ function DashboardPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       <ThemeBoot />
-      <NightSky />
+      <CozyRoom />
       <Header />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 pt-28 pb-24 sm:px-6 lg:px-8">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4 animate-reveal">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/80">Your Galaxy</p>
-            <h1 className="font-display text-5xl text-primary text-glow sm:text-6xl">Hi, {firstName}</h1>
-            <p className="font-elegant mt-2 text-base text-foreground/75">Every memory becomes a star. Add one today.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              to="/add-star"
-              className="font-elegant inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-lg text-primary-foreground hover:scale-105 transition"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              <Plus className="h-4 w-4 not-italic" /> Add Star
-            </Link>
-            <Link
-              to="/love-letters"
-              className="font-elegant glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-lg text-foreground/90 hover:bg-white/15"
-            >
-              <PenLine className="h-4 w-4 not-italic text-accent" /> Write a Letter
-            </Link>
-            <button
-              onClick={signOut}
-              className="font-elegant glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-lg text-foreground/85 hover:bg-white/15"
-            >
-              <LogOut className="h-4 w-4 not-italic" /> Sign out
-            </button>
-          </div>
+      <main className="relative z-10 mx-auto max-w-4xl px-4 pb-32 sm:px-6 lg:px-8" style={{ paddingTop: "max(5.5rem, 9vh)" }}>
+
+        {/* ── 1. Greeting ─────────────────────────────── */}
+        <div className="animate-reveal mb-8 text-center">
+          <p className="mb-1 text-[11px] uppercase tracking-[0.35em] text-primary/65">your little galaxy</p>
+          <h1 className="font-display text-6xl text-primary text-glow sm:text-7xl">{firstName}</h1>
+          <p className="font-elegant mt-3 text-lg text-foreground/60">Every memory becomes a star.</p>
         </div>
 
-        {/* Central jar + orbiting stat cards */}
-        <div className="relative grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          <div className="grid grid-cols-2 gap-4 lg:gap-6 order-2 lg:order-1">
-            {stats.slice(0, 4).map((s, i) => (
-              <StatCard key={s.label} {...s} delay={i * 0.08} />
-            ))}
+        {/* ── 2. Jar on shelf ─────────────────────────── */}
+        <div
+          className="animate-reveal flex flex-col items-center"
+          style={{ animationDelay: "0.15s" }}
+        >
+          {/* Jar ambient glow on wall */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute h-56 w-72 rounded-full blur-3xl opacity-20"
+            style={{ background: "radial-gradient(ellipse, oklch(0.88 0.16 80), transparent 70%)" }}
+          />
+
+          {/* The jar — animate-float-jar is already inside MemoryJar */}
+          <MemoryJar size={240} />
+
+          {/* Wooden shelf */}
+          <div className="relative -mt-3 w-full max-w-xs sm:max-w-sm">
+            {/* Top highlight sliver */}
+            <div
+              className="h-[3px] w-full rounded-t-sm"
+              style={{
+                background:
+                  "linear-gradient(90deg, oklch(0.48 0.09 64 / 0.25), oklch(0.62 0.10 68 / 0.65) 35%, oklch(0.55 0.09 65 / 0.45) 70%, oklch(0.45 0.08 60 / 0.22))",
+              }}
+            />
+            {/* Shelf body */}
+            <div
+              className="h-6 w-full"
+              style={{
+                background:
+                  "linear-gradient(180deg, oklch(0.37 0.09 54) 0%, oklch(0.29 0.08 50) 50%, oklch(0.23 0.06 46) 100%)",
+                boxShadow:
+                  "0 6px 28px oklch(0.09 0.04 40 / 0.85), inset 0 1px 0 oklch(0.52 0.08 65 / 0.30)",
+              }}
+            />
+            {/* Jar contact glow on shelf top */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute top-[3px] left-1/2 h-4 w-24 -translate-x-1/2 blur-xl"
+              style={{ background: "oklch(0.90 0.15 82 / 0.45)" }}
+            />
           </div>
 
-          <div className="flex justify-center order-1 lg:order-2 animate-reveal" style={{ animationDelay: "0.2s" }}>
-            <MemoryJar size={340} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 lg:gap-6 order-3">
-            {stats.slice(4).map((s, i) => (
-              <StatCard key={s.label} {...s} delay={0.32 + i * 0.08} />
-            ))}
-          </div>
+          {/* Drop shadow below shelf */}
+          <div
+            aria-hidden
+            className="-mt-1 h-8 w-3/4 blur-xl opacity-50"
+            style={{ background: "radial-gradient(ellipse, oklch(0.08 0.03 40), transparent 70%)" }}
+          />
         </div>
 
-        {/* Recent stars strip */}
+        {/* ── 3. Primary stat cards ─────────────────── */}
+        <div
+          className="animate-reveal mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4"
+          style={{ animationDelay: "0.30s" }}
+        >
+          {primaryStats.map((s, i) => (
+            <StatCard key={s.label} {...s} delay={0.30 + i * 0.06} />
+          ))}
+        </div>
+
+        {/* ── 4. Coming-soon compact row ─────────────── */}
+        <div
+          className="animate-reveal mt-3 grid grid-cols-3 gap-3"
+          style={{ animationDelay: "0.52s" }}
+        >
+          {soonStats.map((s, i) => (
+            <StatCard key={s.label} {...s} delay={0.52 + i * 0.06} compact />
+          ))}
+        </div>
+
+        {/* ── 5. Action buttons ──────────────────────── */}
+        <div
+          className="animate-reveal mt-9 flex flex-wrap items-center justify-center gap-3"
+          style={{ animationDelay: "0.60s" }}
+        >
+          <Link
+            to="/add-star"
+            className="font-elegant inline-flex items-center gap-2 rounded-full px-6 py-3 text-lg text-primary-foreground shadow-lg transition hover:scale-[1.04]"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            <Plus className="h-4 w-4 not-italic" /> Add a Star
+          </Link>
+          <Link
+            to="/love-letters"
+            className="font-elegant glass inline-flex items-center gap-2 rounded-full px-5 py-3 text-lg text-foreground/85 transition hover:bg-white/15"
+          >
+            <PenLine className="h-4 w-4 not-italic text-accent" /> Write a Letter
+          </Link>
+          <button
+            onClick={signOut}
+            className="font-elegant glass inline-flex items-center gap-2 rounded-full px-5 py-3 text-lg text-foreground/65 transition hover:bg-white/15"
+          >
+            <LogOut className="h-4 w-4 not-italic" /> Sign out
+          </button>
+        </div>
+
+        {/* ── 6. Recent memories ─────────────────────── */}
         {recent.length > 0 && (
-          <section className="mt-16 animate-reveal" style={{ animationDelay: "0.6s" }}>
-            <div className="mb-4 flex items-baseline justify-between">
+          <section
+            className="animate-reveal mt-16"
+            style={{ animationDelay: "0.75s" }}
+          >
+            <div className="mb-5 flex items-baseline justify-between">
               <h2 className="font-display text-3xl text-primary text-glow">Recent stars</h2>
-              <Link to="/my-jar" className="text-sm text-foreground/70 hover:text-primary">View all →</Link>
+              <Link
+                to="/my-jar"
+                className="font-elegant text-base text-foreground/55 transition hover:text-primary"
+              >
+                View all →
+              </Link>
             </div>
+
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {recent.map((s) => (
-                <div key={s.id} className="glass rounded-3xl p-5 transition hover:bg-white/10">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-10 w-10 items-center justify-center rounded-2xl"
-                      style={{ background: `${STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold} / 0.15`, color: STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold }}
-                    >
-                      <Sparkles className="h-5 w-5" />
+              {recent.map((s, i) => {
+                const color = STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold;
+                return (
+                  <div
+                    key={s.id}
+                    className="glass animate-reveal rounded-3xl p-5 transition hover:bg-white/10"
+                    style={{ animationDelay: `${0.75 + i * 0.06}s` }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl"
+                        style={{ background: `${color}22`, color }}
+                      >
+                        <Sparkles className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-display text-xl text-primary">{s.title}</p>
+                        <p className="font-elegant text-sm text-foreground/55">
+                          {new Date(s.starred_on).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-display text-xl text-primary">{s.title}</p>
-                      <p className="font-elegant text-sm text-foreground/60">{new Date(s.starred_on).toLocaleDateString()}</p>
-                    </div>
+                    {s.note && (
+                      <p className="font-elegant mt-3 line-clamp-3 text-base text-foreground/75">
+                        {s.note}
+                      </p>
+                    )}
                   </div>
-                  {s.note && <p className="font-elegant mt-3 line-clamp-3 text-base text-foreground/80">{s.note}</p>}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
@@ -139,6 +222,10 @@ function DashboardPage() {
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
 
 function unlockedCount(stars: number, letters: number, days: number): number {
   let n = 0;
@@ -153,7 +240,7 @@ function unlockedCount(stars: number, letters: number, days: number): number {
 }
 
 function StatCard({
-  label, value, icon: Icon, color, delay = 0, to, soon,
+  label, value, icon: Icon, color, delay = 0, to, soon, compact,
 }: {
   label: string;
   value: number;
@@ -162,24 +249,44 @@ function StatCard({
   delay?: number;
   to?: "/my-jar" | "/love-letters" | "/achievements" | "/settings";
   soon?: boolean;
+  compact?: boolean;
 }) {
   const inner = (
-    <div className="glass animate-reveal relative rounded-3xl p-5 transition hover:scale-[1.03] hover:bg-white/10" style={{ animationDelay: `${delay}s` }}>
+    <div
+      className="glass animate-reveal relative rounded-3xl transition hover:scale-[1.04] hover:bg-white/10"
+      style={{
+        animationDelay: `${delay}s`,
+        padding: compact ? "0.75rem 1rem" : "1.1rem 1.25rem",
+      }}
+    >
       {soon && (
-        <span className="absolute right-3 top-3 rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-foreground/70">
+        <span className="absolute right-2.5 top-2.5 rounded-full bg-white/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-foreground/55">
           soon
         </span>
       )}
       <div
-        className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl"
-        style={{ background: `${color} / 0.15`, color }}
+        className="mb-2.5 flex items-center justify-center rounded-xl"
+        style={{
+          width: compact ? 36 : 42,
+          height: compact ? 36 : 42,
+          background: `${color}1a`,
+          color,
+        }}
       >
-        <Icon className="h-5 w-5" />
+        <Icon className={compact ? "h-4 w-4" : "h-5 w-5"} />
       </div>
-      <p className="font-display text-4xl text-primary text-glow">{value}</p>
-      <p className="font-elegant mt-1 text-sm text-foreground/70">{label}</p>
+      <p
+        className="font-display text-primary text-glow"
+        style={{ fontSize: compact ? "1.6rem" : "2.25rem", lineHeight: 1 }}
+      >
+        {value}
+      </p>
+      <p className="font-elegant mt-1 text-foreground/65" style={{ fontSize: compact ? "0.75rem" : "0.82rem" }}>
+        {label}
+      </p>
     </div>
   );
+
   if (to && !soon) return <Link to={to}>{inner}</Link>;
   return inner;
 }
