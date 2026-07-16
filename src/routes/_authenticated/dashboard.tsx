@@ -83,7 +83,7 @@ function DashboardPage() {
               src={bunnyHer}
               alt=""
               aria-hidden
-              className="animate-bunny-idle relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0"
+              className="animate-bunny-idle relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0 -mr-8 sm:-mr-10 md:-mr-12"
               style={{
                 animationDelay: "0.3s",
                 imageRendering: "pixelated",
@@ -148,7 +148,7 @@ function DashboardPage() {
               src={bunnyHim}
               alt=""
               aria-hidden
-              className="animate-bunny-idle-r relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0"
+              className="animate-bunny-idle-r relative z-10 w-24 sm:w-28 md:w-32 mb-7 flex-shrink-0 -ml-8 sm:-ml-10 md:-ml-12"
               style={{
                 animationDelay: "1.1s",
                 imageRendering: "pixelated",
