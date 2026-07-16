@@ -72,9 +72,15 @@ function AuthPage() {
     // hosted /authorize endpoint, then on to the provider). Do not route this through Lovable's
     // cloud-auth-js broker (`/~oauth/initiate`) — that endpoint only exists on Lovable's own
     // hosting, so on Replit (or any other host) it 404s.
+    //
+    // Use the baked-in Replit external dev origin when available so that the
+    // OAuth callback lands on the real .replit.dev URL rather than the editor's
+    // internal preview iframe origin (which Supabase cannot redirect back to).
+    const replitOrigin = import.meta.env.VITE_REPLIT_DEV_ORIGIN as string | undefined;
+    const origin = replitOrigin || window.location.origin;
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth-callback` },
+      options: { redirectTo: `${origin}/auth-callback` },
     });
     if (error) {
       toast.error(error.message);

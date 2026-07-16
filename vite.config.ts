@@ -15,6 +15,18 @@ export default defineConfig({
   // Replit's preview proxy serves the app on port 5000 from an iframe on a
   // different origin, so the dev server must bind 0.0.0.0:5000 and accept any host.
   vite: {
+    // Bake the Replit external dev domain in at Vite startup so client code can
+    // build correct OAuth redirectTo URLs even when the page is loaded from the
+    // editor's internal preview iframe (whose origin differs from the real URL).
+    // Outside Replit, REPLIT_DEV_DOMAIN is absent → empty string → code falls
+    // back to window.location.origin, which is correct everywhere else.
+    define: {
+      "import.meta.env.VITE_REPLIT_DEV_ORIGIN": JSON.stringify(
+        process.env.REPLIT_DEV_DOMAIN
+          ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+          : ""
+      ),
+    },
     server: {
       host: "0.0.0.0",
       port: 5000,
