@@ -56,16 +56,16 @@ function HomePage() {
         <div className="animate-reveal mt-10 flex flex-col items-center gap-3 sm:flex-row" style={{ animationDelay: "0.55s" }}>
           <Link
             to={enterTo}
-            className="group relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-semibold tracking-widest uppercase antialiased text-primary-foreground shadow-lg transition-all hover:scale-105"
-            style={{ background: "var(--gradient-primary)", fontFamily: "var(--font-sans)" }}
+            className="group relative inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-lg text-primary-foreground shadow-lg transition-all hover:scale-105"
+            style={{ background: "var(--gradient-primary)", fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontStyle: "italic", letterSpacing: "0.04em" }}
           >
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-4 w-4 not-italic" />
             Enter Our Galaxy
           </Link>
           <Link
             to={beginTo}
-            className="inline-flex items-center gap-2 rounded-full glass px-7 py-3 text-sm font-semibold tracking-widest uppercase antialiased text-foreground/90 transition hover:bg-white/15"
-            style={{ fontFamily: "var(--font-sans)" }}
+            className="inline-flex items-center gap-2 rounded-full glass px-7 py-3 text-lg text-foreground/90 transition hover:bg-white/15"
+            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontStyle: "italic", letterSpacing: "0.04em" }}
           >
             <Heart className="h-4 w-4 text-accent" />
             Begin Our Story
