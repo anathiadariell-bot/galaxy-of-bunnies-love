@@ -51,6 +51,7 @@ export type Database = {
           display_name: string | null
           id: string
           partner_name: string | null
+          plan: string
           theme: string
           together_since: string | null
           updated_at: string
@@ -61,6 +62,7 @@ export type Database = {
           display_name?: string | null
           id: string
           partner_name?: string | null
+          plan?: string
           theme?: string
           together_since?: string | null
           updated_at?: string
@@ -71,6 +73,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           partner_name?: string | null
+          plan?: string
           theme?: string
           together_since?: string | null
           updated_at?: string
