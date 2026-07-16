@@ -6,7 +6,8 @@ import { PageShell } from "@/components/galaxy/PageShell";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
 import { GlassCard } from "@/components/galaxy/GlassCard";
 import { EmptyState } from "@/components/galaxy/EmptyState";
-import { useCreateLetter, useLetters } from "@/hooks/useGalaxyData";
+import { UpgradeBanner } from "@/components/galaxy/UpgradeBanner";
+import { useCreateLetter, useLetters, useLetterLimit } from "@/hooks/useGalaxyData";
 
 export const Route = createFileRoute("/_authenticated/love-letters")({
   head: () => ({
@@ -21,12 +22,15 @@ export const Route = createFileRoute("/_authenticated/love-letters")({
 function LoveLettersPage() {
   const { data: letters = [] } = useLetters();
   const create = useCreateLetter();
+  const { allowed, count, max, reason, isLoading } = useLetterLimit();
+
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [unlockAt, setUnlockAt] = useState("");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!allowed) return;
     if (!title.trim() || !body.trim()) {
       toast.error("A letter needs a title and a message");
       return;
@@ -55,51 +59,74 @@ function LoveLettersPage() {
         subtitle="Write a letter. Choose a date. Read it together when the stars align."
       >
         <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-          <form onSubmit={submit}>
-            <GlassCard strong>
-              <div className="flex items-center gap-2 text-primary">
-                <Mail className="h-5 w-5" />
-                <h2 className="font-display text-2xl text-glow">Write a letter</h2>
+          {/* Write panel */}
+          <div className="space-y-4">
+            {/* Limit counter pill */}
+            {!isLoading && max !== Infinity && (
+              <div className="flex justify-end">
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                  allowed ? "bg-white/10 text-foreground/60" : "bg-primary/20 text-primary"
+                }`}>
+                  {count} / {max} letters used
+                </span>
               </div>
-              <label className="mt-6 block">
-                <span className="text-xs uppercase tracking-widest text-foreground/70">To…</span>
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="To my love, on our first year"
-                  className="mt-2 w-full rounded-2xl bg-white/8 px-4 py-3 text-foreground placeholder:text-foreground/40 outline-none ring-1 ring-white/10 focus:ring-primary/60"
-                />
-              </label>
-              <label className="mt-4 block">
-                <span className="text-xs uppercase tracking-widest text-foreground/70">Message</span>
-                <textarea
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  rows={8}
-                  placeholder="Write from the heart…"
-                  className="mt-2 w-full rounded-2xl bg-white/8 px-4 py-3 text-foreground placeholder:text-foreground/40 outline-none ring-1 ring-white/10 focus:ring-primary/60"
-                />
-              </label>
-              <label className="mt-4 block">
-                <span className="text-xs uppercase tracking-widest text-foreground/70">Open on (optional)</span>
-                <input
-                  type="date"
-                  value={unlockAt}
-                  onChange={(e) => setUnlockAt(e.target.value)}
-                  className="mt-2 w-full rounded-2xl bg-white/8 px-4 py-3 text-foreground outline-none ring-1 ring-white/10 focus:ring-primary/60"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={create.isPending}
-                className="font-elegant mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg text-primary-foreground transition hover:scale-[1.02] disabled:opacity-60"
-                style={{ background: "var(--gradient-primary)" }}
-              >
-                <Send className="h-4 w-4 not-italic" /> {create.isPending ? "Sealing…" : "Seal with love"}
-              </button>
-            </GlassCard>
-          </form>
+            )}
 
+            {/* Upgrade banner when limit is reached */}
+            {!isLoading && !allowed && reason && (
+              <UpgradeBanner message={reason} />
+            )}
+
+            <form onSubmit={submit}>
+              <GlassCard strong>
+                <div className="flex items-center gap-2 text-primary">
+                  <Mail className="h-5 w-5" />
+                  <h2 className="font-display text-2xl text-glow">Write a letter</h2>
+                </div>
+                <label className="mt-6 block">
+                  <span className="text-xs uppercase tracking-widest text-foreground/70">To…</span>
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="To my love, on our first year"
+                    disabled={!allowed}
+                    className="mt-2 w-full rounded-2xl bg-white/8 px-4 py-3 text-foreground placeholder:text-foreground/40 outline-none ring-1 ring-white/10 focus:ring-primary/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                  />
+                </label>
+                <label className="mt-4 block">
+                  <span className="text-xs uppercase tracking-widest text-foreground/70">Message</span>
+                  <textarea
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                    rows={8}
+                    placeholder="Write from the heart…"
+                    disabled={!allowed}
+                    className="mt-2 w-full rounded-2xl bg-white/8 px-4 py-3 text-foreground placeholder:text-foreground/40 outline-none ring-1 ring-white/10 focus:ring-primary/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                  />
+                </label>
+                <label className="mt-4 block">
+                  <span className="text-xs uppercase tracking-widest text-foreground/70">Open on (optional)</span>
+                  <input
+                    type="date"
+                    value={unlockAt}
+                    onChange={(e) => setUnlockAt(e.target.value)}
+                    disabled={!allowed}
+                    className="mt-2 w-full rounded-2xl bg-white/8 px-4 py-3 text-foreground outline-none ring-1 ring-white/10 focus:ring-primary/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={create.isPending || !allowed || isLoading}
+                  className="font-elegant mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg text-primary-foreground transition hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  style={{ background: "var(--gradient-primary)" }}
+                >
+                  <Send className="h-4 w-4 not-italic" /> {create.isPending ? "Sealing…" : "Seal with love"}
+                </button>
+              </GlassCard>
+            </form>
+          </div>
+
+          {/* Letters list */}
           <div>
             {letters.length === 0 ? (
               <EmptyState
