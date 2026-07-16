@@ -77,16 +77,16 @@ function TimelinePage() {
                       }`}
                       style={{ animationDelay: `${Math.min(i, 10) * 0.05}s` }}
                     >
-                      <div className="flex items-center gap-2 text-xs text-foreground/60">
-                        {ev.kind === "star" ? <Sparkles className="h-3 w-3" /> : <Mail className="h-3 w-3" />}
+                      <div className="font-elegant flex items-center gap-2 text-sm text-foreground/60">
+                        {ev.kind === "star" ? <Sparkles className="h-3 w-3 not-italic" /> : <Mail className="h-3 w-3 not-italic" />}
                         <span>{new Date(ev.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</span>
                       </div>
                       <h3 className="mt-1 font-display text-2xl text-primary text-glow">{ev.title}</h3>
                       {ev.kind === "star" && ev.note && (
-                        <p className="mt-2 text-sm text-foreground/80">{ev.note}</p>
+                        <p className="font-elegant mt-2 text-base text-foreground/80">{ev.note}</p>
                       )}
                       {ev.kind === "letter" && (
-                        <p className="mt-2 line-clamp-3 text-sm text-foreground/75">{ev.body}</p>
+                        <p className="font-elegant mt-2 line-clamp-3 text-base text-foreground/75">{ev.body}</p>
                       )}
                     </div>
                   </li>

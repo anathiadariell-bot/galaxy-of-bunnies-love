@@ -31,7 +31,7 @@ export function PageShell({ children, eyebrow, title, subtitle, actions, wide }:
               {title && (
                 <h1 className="font-display text-5xl text-primary text-glow sm:text-6xl">{title}</h1>
               )}
-              {subtitle && <p className="mt-2 max-w-xl text-sm text-foreground/75">{subtitle}</p>}
+              {subtitle && <p className="font-elegant mt-2 max-w-xl text-base text-foreground/75">{subtitle}</p>}
             </div>
             {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
           </div>

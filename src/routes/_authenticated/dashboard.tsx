@@ -61,27 +61,27 @@ function DashboardPage() {
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-primary/80">Your Galaxy</p>
             <h1 className="font-display text-5xl text-primary text-glow sm:text-6xl">Hi, {firstName}</h1>
-            <p className="mt-2 text-sm text-foreground/75">Every memory becomes a star. Add one today.</p>
+            <p className="font-elegant mt-2 text-base text-foreground/75">Every memory becomes a star. Add one today.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
               to="/add-star"
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-primary-foreground hover:scale-105 transition"
+              className="font-elegant inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-lg text-primary-foreground hover:scale-105 transition"
               style={{ background: "var(--gradient-primary)" }}
             >
-              <Plus className="h-4 w-4" /> Add Star
+              <Plus className="h-4 w-4 not-italic" /> Add Star
             </Link>
             <Link
               to="/love-letters"
-              className="glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm text-foreground/90 hover:bg-white/15"
+              className="font-elegant glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-lg text-foreground/90 hover:bg-white/15"
             >
-              <PenLine className="h-4 w-4 text-accent" /> Write a Letter
+              <PenLine className="h-4 w-4 not-italic text-accent" /> Write a Letter
             </Link>
             <button
               onClick={signOut}
-              className="glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm text-foreground/85 hover:bg-white/15"
+              className="font-elegant glass inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-lg text-foreground/85 hover:bg-white/15"
             >
-              <LogOut className="h-4 w-4" /> Sign out
+              <LogOut className="h-4 w-4 not-italic" /> Sign out
             </button>
           </div>
         </div>
@@ -124,10 +124,10 @@ function DashboardPage() {
                     </div>
                     <div className="min-w-0">
                       <p className="truncate font-display text-xl text-primary">{s.title}</p>
-                      <p className="text-xs text-foreground/60">{new Date(s.starred_on).toLocaleDateString()}</p>
+                      <p className="font-elegant text-sm text-foreground/60">{new Date(s.starred_on).toLocaleDateString()}</p>
                     </div>
                   </div>
-                  {s.note && <p className="mt-3 line-clamp-3 text-sm text-foreground/80">{s.note}</p>}
+                  {s.note && <p className="font-elegant mt-3 line-clamp-3 text-base text-foreground/80">{s.note}</p>}
                 </div>
               ))}
             </div>
@@ -177,7 +177,7 @@ function StatCard({
         <Icon className="h-5 w-5" />
       </div>
       <p className="font-display text-4xl text-primary text-glow">{value}</p>
-      <p className="mt-1 text-xs uppercase tracking-widest text-foreground/70">{label}</p>
+      <p className="font-elegant mt-1 text-sm text-foreground/70">{label}</p>
     </div>
   );
   if (to && !soon) return <Link to={to}>{inner}</Link>;

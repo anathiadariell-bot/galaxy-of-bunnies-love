@@ -92,10 +92,10 @@ function LoveLettersPage() {
               <button
                 type="submit"
                 disabled={create.isPending}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.02] disabled:opacity-60"
+                className="font-elegant mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg text-primary-foreground transition hover:scale-[1.02] disabled:opacity-60"
                 style={{ background: "var(--gradient-primary)" }}
               >
-                <Send className="h-4 w-4" /> {create.isPending ? "Sealing…" : "Seal with love"}
+                <Send className="h-4 w-4 not-italic" /> {create.isPending ? "Sealing…" : "Seal with love"}
               </button>
             </GlassCard>
           </form>
@@ -117,7 +117,7 @@ function LoveLettersPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <h3 className="truncate font-display text-2xl text-primary text-glow">{l.title}</h3>
-                          <p className="mt-1 text-xs text-foreground/60">
+                          <p className="font-elegant mt-1 text-sm text-foreground/60">
                             Sealed {new Date(l.created_at).toLocaleDateString()}
                             {l.unlock_at && ` · Opens ${new Date(l.unlock_at).toLocaleDateString()}`}
                           </p>
@@ -136,7 +136,7 @@ function LoveLettersPage() {
                         )}
                       </div>
                       {isOpen && !locked && (
-                        <p className="mt-4 whitespace-pre-wrap text-sm text-foreground/85 animate-reveal">{l.body}</p>
+                        <p className="font-elegant mt-4 whitespace-pre-wrap text-base text-foreground/85 animate-reveal">{l.body}</p>
                       )}
                     </GlassCard>
                   );

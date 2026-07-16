@@ -74,7 +74,7 @@ function AchievementsPage() {
                     <p className={`font-display text-2xl ${unlocked ? "text-primary text-glow" : "text-foreground/70"}`}>
                       {b.title}
                     </p>
-                    <p className="text-xs text-foreground/60">{b.description}</p>
+                    <p className="font-elegant text-sm text-foreground/60">{b.description}</p>
                   </div>
                 </div>
                 <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -86,8 +86,8 @@ function AchievementsPage() {
                     }}
                   />
                 </div>
-                <p className="mt-2 text-xs text-foreground/60">
-                  {unlocked ? "Unlocked" : `${b.progress} / ${b.goal}`}
+                <p className="font-elegant mt-2 text-sm text-foreground/60">
+                  {unlocked ? "Unlocked ✦" : `${b.progress} / ${b.goal}`}
                 </p>
               </GlassCard>
             );

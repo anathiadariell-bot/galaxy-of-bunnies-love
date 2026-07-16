@@ -17,14 +17,14 @@ export function EmptyState({ icon, title, description, ctaLabel, ctaTo }: Props)
         {icon ?? <Sparkles className="h-6 w-6" />}
       </div>
       <h3 className="font-display text-3xl text-primary text-glow">{title}</h3>
-      {description && <p className="mt-2 text-sm text-foreground/75">{description}</p>}
+      {description && <p className="font-elegant mt-2 text-base text-foreground/75">{description}</p>}
       {ctaLabel && ctaTo && (
         <Link
           to={ctaTo}
-          className="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-primary-foreground hover:scale-105 transition"
+          className="font-elegant mt-6 inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-lg text-primary-foreground hover:scale-105 transition"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Sparkles className="h-4 w-4" /> {ctaLabel}
+          <Sparkles className="h-4 w-4 not-italic" /> {ctaLabel}
         </Link>
       )}
     </div>

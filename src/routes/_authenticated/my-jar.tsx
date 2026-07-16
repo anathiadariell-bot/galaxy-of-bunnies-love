@@ -30,7 +30,7 @@ function MyJarPage() {
         actions={
           <Link
             to="/add-star"
-            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-primary-foreground hover:scale-105 transition"
+            className="font-elegant inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-lg text-primary-foreground hover:scale-105 transition"
             style={{ background: "var(--gradient-primary)" }}
           >
             <Plus className="h-4 w-4" /> Add Star
@@ -42,7 +42,7 @@ function MyJarPage() {
         </div>
 
         {isLoading ? (
-          <div className="text-center text-foreground/60">Loading your stars…</div>
+          <div className="font-elegant text-center text-base text-foreground/60">Loading your stars…</div>
         ) : stars.length === 0 ? (
           <EmptyState
             icon={<Sparkles className="h-6 w-6" />}
@@ -69,12 +69,12 @@ function MyJarPage() {
                     >
                       <Sparkles className="h-5 w-5" />
                     </div>
-                    <span className="text-xs text-foreground/60">
+                    <span className="font-elegant text-sm text-foreground/60">
                       {new Date(s.starred_on).toLocaleDateString()}
                     </span>
                   </div>
                   <h3 className="mt-4 font-display text-2xl text-primary text-glow">{s.title}</h3>
-                  {s.note && <p className="mt-2 text-sm text-foreground/80">{s.note}</p>}
+                  {s.note && <p className="font-elegant mt-2 text-base text-foreground/80">{s.note}</p>}
                   {emotion && (
                     <p className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1 text-xs text-foreground/80">
                       <span>{emotion.emoji}</span> {emotion.label}

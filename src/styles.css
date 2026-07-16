@@ -142,6 +142,14 @@ html, body {
   }
 }
 
+/* ── Elegant serif: romantic body text, descriptions, notes, buttons ── */
+.font-elegant {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
 /* ════════════════════════════════════════════
    Utility layer
 ════════════════════════════════════════════ */
