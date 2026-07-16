@@ -1,27 +1,27 @@
 import { useMemo } from "react";
-import jarImg from "@/assets/memory-jar.png";
+import jarImg from "@/assets/memory-jar-pixel.png";
 
 interface Props {
   size?: number;
   className?: string;
 }
 
-/** 3D-looking glowing glass jar with animated colorful stars floating inside. */
+/** Pixel-art magical glass jar with animated pastel memory stars floating inside. */
 export function MemoryJar({ size = 420, className = "" }: Props) {
   const innerStars = useMemo(
     () =>
-      Array.from({ length: 14 }).map((_, i) => ({
-        top: 25 + Math.random() * 55,
-        left: 20 + Math.random() * 60,
-        size: 8 + Math.random() * 14,
+      Array.from({ length: 10 }).map((_, i) => ({
+        top: 30 + Math.random() * 45,
+        left: 22 + Math.random() * 56,
+        size: 6 + Math.random() * 10,
         delay: Math.random() * 5,
         duration: 4 + Math.random() * 4,
         color: [
-          "oklch(0.9 0.15 90)",
-          "oklch(0.85 0.12 20)",
-          "oklch(0.85 0.1 240)",
-          "oklch(0.87 0.11 160)",
-          "oklch(0.88 0.13 320)",
+          "oklch(0.92 0.16 90)",   /* warm gold  */
+          "oklch(0.88 0.13 350)",  /* soft pink  */
+          "oklch(0.85 0.10 240)",  /* sky blue   */
+          "oklch(0.87 0.11 290)",  /* lavender   */
+          "oklch(0.88 0.12 160)",  /* mint green */
         ][i % 5],
       })),
     [],
@@ -29,24 +29,59 @@ export function MemoryJar({ size = 420, className = "" }: Props) {
 
   return (
     <div className={`relative ${className}`} style={{ width: size, height: size * 1.22 }}>
-      {/* Outer glow halo */}
+
+      {/* ── Outer lavender-blue glow halo ── */}
       <div
         aria-hidden
         className="absolute inset-0 animate-pulse-glow"
         style={{
-          background: "radial-gradient(circle at 50% 60%, oklch(0.9 0.15 90 / 0.55), transparent 60%)",
+          background:
+            "radial-gradient(circle at 50% 62%, oklch(0.80 0.14 280 / 0.48), oklch(0.82 0.10 320 / 0.22) 45%, transparent 68%)",
         }}
       />
 
-      {/* Floating jar */}
+      {/* ── Warm golden core (star energy inside the glass) ── */}
+      <div
+        aria-hidden
+        className="absolute inset-0 animate-pulse-glow"
+        style={{
+          animationDelay: "1.4s",
+          background:
+            "radial-gradient(circle at 50% 68%, oklch(0.92 0.16 90 / 0.28), transparent 52%)",
+        }}
+      />
+
+      {/* ── Soft pink accent bloom ── */}
+      <div
+        aria-hidden
+        className="absolute inset-0 animate-pulse-glow"
+        style={{
+          animationDelay: "2.8s",
+          background:
+            "radial-gradient(ellipse at 60% 55%, oklch(0.88 0.13 350 / 0.18), transparent 55%)",
+        }}
+      />
+
+      {/* ── Floating jar sprite ── */}
       <div className="relative h-full w-full animate-float-jar">
         <img
           src={jarImg}
           alt="Glass jar of memories"
-          className="h-full w-full object-contain drop-shadow-[0_20px_60px_oklch(0.9_0.15_90_/_0.35)]"
+          className="h-full w-full object-contain"
+          style={{
+            imageRendering: "pixelated",
+            filter: [
+              /* blue-lavender halo matching the glass */
+              "drop-shadow(0 16px 48px oklch(0.80 0.14 280 / 0.45))",
+              /* soft pink rim glow */
+              "drop-shadow(0 0 28px oklch(0.88 0.13 350 / 0.28))",
+              /* warm golden sparkle core */
+              "drop-shadow(0 0 14px oklch(0.92 0.16 90 / 0.30))",
+            ].join(" "),
+          }}
         />
 
-        {/* Overlay: bonus twinkling stars inside jar */}
+        {/* ── Twinkling pixel star sparkles floating inside ── */}
         <div className="pointer-events-none absolute inset-0">
           {innerStars.map((s, i) => (
             <span
@@ -59,23 +94,42 @@ export function MemoryJar({ size = 420, className = "" }: Props) {
                 height: s.size,
                 animationDelay: `${s.delay}s`,
                 animationDuration: `${s.duration}s`,
-                filter: `drop-shadow(0 0 8px ${s.color})`,
+                filter: `drop-shadow(0 0 6px ${s.color})`,
               }}
             >
-              <svg viewBox="0 0 24 24" fill={s.color} className="h-full w-full opacity-80">
+              <svg viewBox="0 0 24 24" fill={s.color} className="h-full w-full opacity-75">
                 <path d="M12 2l2.9 6.6L22 9.7l-5.2 4.7L18.2 22 12 18.3 5.8 22l1.4-7.6L2 9.7l7.1-1.1L12 2z" />
               </svg>
             </span>
           ))}
         </div>
 
-        {/* Escaping light */}
+        {/* ── Magical energy escaping from the cork top ── */}
         <div
           aria-hidden
-          className="absolute left-1/2 top-0 h-32 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-70 animate-twinkle"
+          className="absolute left-1/2 top-0 h-28 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full animate-twinkle"
           style={{
-            background: "radial-gradient(circle, oklch(0.95 0.14 90 / 0.7), transparent 70%)",
-            filter: "blur(14px)",
+            opacity: 0.65,
+            background:
+              "radial-gradient(circle, oklch(0.92 0.16 90 / 0.70), oklch(0.85 0.12 320 / 0.40) 40%, transparent 70%)",
+            filter: "blur(12px)",
+          }}
+        />
+
+        {/* ── Glass reflection shimmer — white streak on upper-left face ── */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute animate-twinkle"
+          style={{
+            top: "18%",
+            left: "17%",
+            width: "11%",
+            height: "33%",
+            background:
+              "linear-gradient(155deg, oklch(1 0 0 / 0.55), oklch(0.94 0.04 280 / 0.20) 55%, transparent)",
+            borderRadius: "40% 60% 60% 40% / 30% 30% 70% 70%",
+            filter: "blur(2px)",
+            animationDelay: "0.8s",
           }}
         />
       </div>

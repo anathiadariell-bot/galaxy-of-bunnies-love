@@ -80,7 +80,7 @@ function HomePage() {
             className="pointer-events-none absolute inset-x-0 bottom-2 mx-auto h-40 w-[85%] rounded-[50%] blur-3xl opacity-70"
             style={{
               background:
-                "radial-gradient(ellipse at 50% 60%, oklch(0.9 0.15 90 / 0.55), oklch(0.75 0.14 250 / 0.25) 45%, transparent 75%)",
+                "radial-gradient(ellipse at 50% 60%, oklch(0.82 0.14 280 / 0.52), oklch(0.85 0.10 320 / 0.28) 40%, oklch(0.92 0.16 90 / 0.18) 65%, transparent 78%)",
             }}
           />
 
