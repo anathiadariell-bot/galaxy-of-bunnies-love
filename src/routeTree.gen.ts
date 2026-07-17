@@ -14,6 +14,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GiftTokenRouteImport } from './routes/gift.$token'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedThemesRouteImport } from './routes/_authenticated/themes'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -48,6 +49,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftTokenRoute = GiftTokenRouteImport.update({
+  id: '/gift/$token',
+  path: '/gift/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/gift/$token': typeof GiftTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/gift/$token': typeof GiftTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/themes': typeof AuthenticatedThemesRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
+  '/gift/$token': typeof GiftTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/themes'
     | '/timeline'
+    | '/gift/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/themes'
     | '/timeline'
+    | '/gift/$token'
   id:
     | '__root__'
     | '/'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/themes'
     | '/_authenticated/timeline'
+    | '/gift/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,6 +234,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  GiftTokenRoute: typeof GiftTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gift/$token': {
+      id: '/gift/$token'
+      path: '/gift/$token'
+      fullPath: '/gift/$token'
+      preLoaderRoute: typeof GiftTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/timeline': {
@@ -378,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  GiftTokenRoute: GiftTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
