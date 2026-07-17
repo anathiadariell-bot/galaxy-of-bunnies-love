@@ -20,6 +20,16 @@ export const Route = createFileRoute("/_authenticated/my-jar")({
   component: MyJarPage,
 });
 
+// ─── Glow level from star count ────────────────────────────────────────────────
+
+function getGlowLevel(count: number): number {
+  if (count <= 0)  return 0;
+  if (count <= 3)  return 1;
+  if (count <= 7)  return 2;
+  if (count <= 11) return 3;
+  return 4;
+}
+
 // ─── Static lookup tables (no Math.random — SSR-safe) ──────────────────────────
 
 const COLOR_LABELS: Record<StarColor, string> = {
@@ -127,9 +137,13 @@ function StarOrb({
 function JarScene({
   stars,
   onStarClick,
+  glowLevel,
+  isArriving,
 }: {
   stars: Star[];
   onStarClick: (s: Star) => void;
+  glowLevel: number;
+  isArriving: boolean;
 }) {
   const total = stars.length;
 
@@ -153,7 +167,25 @@ function JarScene({
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ zIndex: 10 }}
       >
-        <MemoryJar size={230} />
+        {/* Arrival bloom — radiates outward when a new star lands */}
+        {isArriving && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute animate-jar-bloom rounded-full"
+            style={{
+              inset: "-22%",
+              background:
+                "radial-gradient(circle, oklch(0.92 0.16 90 / 0.75), oklch(0.84 0.13 320 / 0.45) 42%, transparent 68%)",
+              filter: "blur(18px)",
+              zIndex: -1,
+            }}
+          />
+        )}
+
+        {/* Pulse wrapper — bounces the whole jar on arrival */}
+        <div className={isArriving ? "animate-jar-arrival" : undefined}>
+          <MemoryJar size={230} glowLevel={glowLevel} />
+        </div>
       </div>
 
       {/* Orbiting stars */}
@@ -367,11 +399,24 @@ function Chip({ children }: { children: React.ReactNode }) {
 function MyJarPage() {
   const { data: stars = [], isLoading } = useStars();
   const [selected, setSelected] = useState<Star | null>(null);
+  const [isArriving, setIsArriving] = useState(false);
+
+  // Detect arrival from the cast animation (flag set in add-star before navigate)
+  useEffect(() => {
+    if (typeof sessionStorage !== "undefined" &&
+        sessionStorage.getItem("jar-new-star") === "1") {
+      sessionStorage.removeItem("jar-new-star");
+      setIsArriving(true);
+      const t = setTimeout(() => setIsArriving(false), 2100);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   // Stars shown in the orbit (cap at 12 so the scene isn't cluttered)
   const orbitStars = stars.slice(0, 12);
   // All stars shown in the list below
   const isEmpty = !isLoading && stars.length === 0;
+  const glowLevel = getGlowLevel(stars.length);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -407,14 +452,19 @@ function MyJarPage() {
             className="flex animate-reveal justify-center"
             style={{ animationDelay: "0.15s" }}
           >
-            <MemoryJar size={240} />
+            <MemoryJar size={240} glowLevel={0} />
           </div>
         ) : (
           <div
             className="animate-reveal"
             style={{ animationDelay: "0.15s" }}
           >
-            <JarScene stars={orbitStars} onStarClick={setSelected} />
+            <JarScene
+              stars={orbitStars}
+              onStarClick={setSelected}
+              glowLevel={glowLevel}
+              isArriving={isArriving}
+            />
           </div>
         )}
 

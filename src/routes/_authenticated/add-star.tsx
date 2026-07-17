@@ -411,6 +411,7 @@ function AddStarPage() {
     setTimeout(async () => {
       try {
         await savePromise;
+        sessionStorage.setItem("jar-new-star", "1");
         navigate({ to: "/my-jar" });
       } catch (err) {
         toast.error("Couldn't save this memory", {
