@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedThemesRouteImport } from './routes/_authenticated/themes'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSendGiftRouteImport } from './routes/_authenticated/send-gift'
 import { Route as AuthenticatedMyJarRouteImport } from './routes/_authenticated/my-jar'
 import { Route as AuthenticatedLoveLettersRouteImport } from './routes/_authenticated/love-letters'
 import { Route as AuthenticatedGalaxyModeRouteImport } from './routes/_authenticated/galaxy-mode'
@@ -62,6 +63,11 @@ const AuthenticatedThemesRoute = AuthenticatedThemesRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSendGiftRoute = AuthenticatedSendGiftRouteImport.update({
+  id: '/send-gift',
+  path: '/send-gift',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMyJarRoute = AuthenticatedMyJarRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
   '/love-letters': typeof AuthenticatedLoveLettersRoute
   '/my-jar': typeof AuthenticatedMyJarRoute
+  '/send-gift': typeof AuthenticatedSendGiftRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/timeline': typeof AuthenticatedTimelineRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
   '/love-letters': typeof AuthenticatedLoveLettersRoute
   '/my-jar': typeof AuthenticatedMyJarRoute
+  '/send-gift': typeof AuthenticatedSendGiftRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/timeline': typeof AuthenticatedTimelineRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
   '/_authenticated/love-letters': typeof AuthenticatedLoveLettersRoute
   '/_authenticated/my-jar': typeof AuthenticatedMyJarRoute
+  '/_authenticated/send-gift': typeof AuthenticatedSendGiftRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/themes': typeof AuthenticatedThemesRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/galaxy-mode'
     | '/love-letters'
     | '/my-jar'
+    | '/send-gift'
     | '/settings'
     | '/themes'
     | '/timeline'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/galaxy-mode'
     | '/love-letters'
     | '/my-jar'
+    | '/send-gift'
     | '/settings'
     | '/themes'
     | '/timeline'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/galaxy-mode'
     | '/_authenticated/love-letters'
     | '/_authenticated/my-jar'
+    | '/_authenticated/send-gift'
     | '/_authenticated/settings'
     | '/_authenticated/themes'
     | '/_authenticated/timeline'
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/send-gift': {
+      id: '/_authenticated/send-gift'
+      path: '/send-gift'
+      fullPath: '/send-gift'
+      preLoaderRoute: typeof AuthenticatedSendGiftRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-jar': {
       id: '/_authenticated/my-jar'
       path: '/my-jar'
@@ -330,6 +349,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGalaxyModeRoute: typeof AuthenticatedGalaxyModeRoute
   AuthenticatedLoveLettersRoute: typeof AuthenticatedLoveLettersRoute
   AuthenticatedMyJarRoute: typeof AuthenticatedMyJarRoute
+  AuthenticatedSendGiftRoute: typeof AuthenticatedSendGiftRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedThemesRoute: typeof AuthenticatedThemesRoute
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
@@ -343,6 +363,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGalaxyModeRoute: AuthenticatedGalaxyModeRoute,
   AuthenticatedLoveLettersRoute: AuthenticatedLoveLettersRoute,
   AuthenticatedMyJarRoute: AuthenticatedMyJarRoute,
+  AuthenticatedSendGiftRoute: AuthenticatedSendGiftRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedThemesRoute: AuthenticatedThemesRoute,
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
