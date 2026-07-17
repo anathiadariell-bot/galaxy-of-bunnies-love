@@ -70,6 +70,9 @@ function getOrbitPos(i: number, total: number) {
 
 // ─── StarOrb ───────────────────────────────────────────────────────────────────
 
+// Orbit star float-animation variants — cycled by star index for organic variety
+const FLOAT_ANIMS = ["animate-float-y", "animate-float-y-b", "animate-float-y-c"] as const;
+
 /**
  * Glowing, floating star orb used in both the jar orbit and the modal preview.
  */
@@ -78,12 +81,14 @@ function StarOrb({
   size = 32,
   delay = 0,
   float = true,
+  floatClass = "animate-float-y",
   onClick,
 }: {
   color: string;
   size?: number;
   delay?: number;
   float?: boolean;
+  floatClass?: string;
   onClick?: () => void;
 }) {
   const Tag = onClick ? "button" : "div";
@@ -92,7 +97,7 @@ function StarOrb({
       {...(onClick ? { onClick, "aria-label": "Open memory" } : {})}
       className={[
         "rounded-full",
-        float ? "animate-float-y" : "",
+        float ? floatClass : "",
         onClick ? "cursor-pointer transition-transform hover:scale-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" : "",
       ].join(" ")}
       style={{
@@ -164,8 +169,8 @@ function JarScene({
 
       {/* Jar — z-10 so lower-arc stars (z-20) render in front */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ zIndex: 10 }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-jar-enter"
+        style={{ zIndex: 10, animationDelay: "0.1s" }}
       >
         {/* Arrival bloom — radiates outward when a new star lands */}
         {isArriving && (
@@ -192,11 +197,13 @@ function JarScene({
       {stars.map((s, i) => {
         const pos = getOrbitPos(i, total);
         const color = STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold;
-        const size = ORBIT_SIZES[i % ORBIT_SIZES.length];
+        const orbSize = ORBIT_SIZES[i % ORBIT_SIZES.length];
         const delay = FLOAT_DELAYS[i % FLOAT_DELAYS.length];
         // Stars in lower half of orbit are "in front" of the jar
         const topPct = parseFloat(pos.top);
         const zIndex = topPct >= 49 ? 20 : 8;
+        // Stagger entrance: first star at 0.22s, each subsequent +0.06s
+        const enterDelay = (0.22 + i * 0.06).toFixed(2);
 
         return (
           <div
@@ -209,12 +216,19 @@ function JarScene({
               zIndex,
             }}
           >
-            <StarOrb
-              color={color}
-              size={size}
-              delay={delay}
-              onClick={() => onStarClick(s)}
-            />
+            {/* Entrance wrapper — pops in on mount, then hands off to the float animation */}
+            <div
+              className="animate-orbit-star-enter"
+              style={{ animationDelay: `${enterDelay}s` }}
+            >
+              <StarOrb
+                color={color}
+                size={orbSize}
+                delay={delay}
+                floatClass={FLOAT_ANIMS[i % FLOAT_ANIMS.length]}
+                onClick={() => onStarClick(s)}
+              />
+            </div>
           </div>
         );
       })}

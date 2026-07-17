@@ -90,105 +90,108 @@ export function MemoryJar({ size = 420, className = "", glowLevel = 0 }: Props) 
 
       {/* ── Floating jar sprite ── */}
       <div className="relative h-full w-full animate-float-jar">
-        <img
-          src={jarImg}
-          alt="Glass jar of memories"
-          className="h-full w-full object-contain"
-          style={{
-            imageRendering: "pixelated",
-            filter: [
-              `drop-shadow(0 16px ${g.s1px}px oklch(0.80 0.14 280 / ${g.s1a}))`,
-              `drop-shadow(0 0 28px oklch(0.88 0.13 350 / ${g.s2a}))`,
-              `drop-shadow(0 0 14px oklch(0.92 0.16 90 / ${g.s3a}))`,
-            ].join(" "),
-          }}
-        />
+        {/* Breathing wrapper — very subtle inhale/exhale layered on top of the float */}
+        <div className="relative h-full w-full animate-jar-breathe">
+          <img
+            src={jarImg}
+            alt="Glass jar of memories"
+            className="h-full w-full object-contain"
+            style={{
+              imageRendering: "pixelated",
+              filter: [
+                `drop-shadow(0 16px ${g.s1px}px oklch(0.80 0.14 280 / ${g.s1a}))`,
+                `drop-shadow(0 0 28px oklch(0.88 0.13 350 / ${g.s2a}))`,
+                `drop-shadow(0 0 14px oklch(0.92 0.16 90 / ${g.s3a}))`,
+              ].join(" "),
+            }}
+          />
 
-        {/* ── Twinkling pixel star sparkles floating inside ── */}
-        <div className="pointer-events-none absolute inset-0">
-          {innerStars.map((s, i) => (
-            <span
-              key={i}
-              className="absolute animate-float-star"
-              style={{
-                top: `${s.top}%`,
-                left: `${s.left}%`,
-                width: s.size,
-                height: s.size,
-                animationDelay: `${s.delay}s`,
-                animationDuration: `${s.duration}s`,
-                filter: `drop-shadow(0 0 6px ${s.color})`,
-              }}
-            >
-              <svg viewBox="0 0 24 24" fill={s.color} className="h-full w-full opacity-75">
-                <path d="M12 2l2.9 6.6L22 9.7l-5.2 4.7L18.2 22 12 18.3 5.8 22l1.4-7.6L2 9.7l7.1-1.1L12 2z" />
-              </svg>
-            </span>
-          ))}
+          {/* ── Twinkling pixel star sparkles floating inside ── */}
+          <div className="pointer-events-none absolute inset-0">
+            {innerStars.map((s, i) => (
+              <span
+                key={i}
+                className="absolute animate-float-star"
+                style={{
+                  top: `${s.top}%`,
+                  left: `${s.left}%`,
+                  width: s.size,
+                  height: s.size,
+                  animationDelay: `${s.delay}s`,
+                  animationDuration: `${s.duration}s`,
+                  filter: `drop-shadow(0 0 6px ${s.color})`,
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill={s.color} className="h-full w-full opacity-75">
+                  <path d="M12 2l2.9 6.6L22 9.7l-5.2 4.7L18.2 22 12 18.3 5.8 22l1.4-7.6L2 9.7l7.1-1.1L12 2z" />
+                </svg>
+              </span>
+            ))}
+          </div>
+
+          {/* ── Magical energy escaping from the cork top ── */}
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-0 h-28 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full animate-twinkle"
+            style={{
+              opacity: g.cork,
+              background:
+                "radial-gradient(circle, oklch(0.92 0.16 90 / 0.70), oklch(0.85 0.12 320 / 0.40) 40%, transparent 70%)",
+              filter: "blur(12px)",
+            }}
+          />
+
+          {/* ── Glass atmosphere — primary reflection: upper-left streak ── */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute animate-twinkle"
+            style={{
+              top: "18%",
+              left: "17%",
+              width: "11%",
+              height: "33%",
+              background:
+                "linear-gradient(155deg, oklch(1 0 0 / 0.55), oklch(0.94 0.04 280 / 0.20) 55%, transparent)",
+              borderRadius: "40% 60% 60% 40% / 30% 30% 70% 70%",
+              filter: "blur(2px)",
+              animationDelay: "0.8s",
+            }}
+          />
+
+          {/* ── Glass atmosphere — secondary reflection: upper-right glint ── */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute animate-twinkle"
+            style={{
+              top: "24%",
+              right: "16%",
+              width: "6%",
+              height: "18%",
+              background:
+                "linear-gradient(210deg, oklch(1 0 0 / 0.28), oklch(0.90 0.05 280 / 0.10) 55%, transparent)",
+              borderRadius: "50% 40% 40% 50% / 40% 40% 60% 60%",
+              filter: "blur(1.5px)",
+              animationDelay: "1.9s",
+            }}
+          />
+
+          {/* ── Glass atmosphere — inner starlight pool at jar base ── */}
+          {/* Warm collected light that grows subtly with glowLevel */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute animate-pulse-glow"
+            style={{
+              bottom: "11%",
+              left: "22%",
+              right: "22%",
+              height: "20%",
+              background:
+                `radial-gradient(ellipse at 50% 75%, oklch(0.92 0.15 82 / ${poolA}), oklch(0.87 0.12 320 / ${poolA2}) 55%, transparent 80%)`,
+              filter: "blur(9px)",
+              animationDelay: "2.1s",
+            }}
+          />
         </div>
-
-        {/* ── Magical energy escaping from the cork top ── */}
-        <div
-          aria-hidden
-          className="absolute left-1/2 top-0 h-28 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full animate-twinkle"
-          style={{
-            opacity: g.cork,
-            background:
-              "radial-gradient(circle, oklch(0.92 0.16 90 / 0.70), oklch(0.85 0.12 320 / 0.40) 40%, transparent 70%)",
-            filter: "blur(12px)",
-          }}
-        />
-
-        {/* ── Glass atmosphere — primary reflection: upper-left streak ── */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute animate-twinkle"
-          style={{
-            top: "18%",
-            left: "17%",
-            width: "11%",
-            height: "33%",
-            background:
-              "linear-gradient(155deg, oklch(1 0 0 / 0.55), oklch(0.94 0.04 280 / 0.20) 55%, transparent)",
-            borderRadius: "40% 60% 60% 40% / 30% 30% 70% 70%",
-            filter: "blur(2px)",
-            animationDelay: "0.8s",
-          }}
-        />
-
-        {/* ── Glass atmosphere — secondary reflection: upper-right glint ── */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute animate-twinkle"
-          style={{
-            top: "24%",
-            right: "16%",
-            width: "6%",
-            height: "18%",
-            background:
-              "linear-gradient(210deg, oklch(1 0 0 / 0.28), oklch(0.90 0.05 280 / 0.10) 55%, transparent)",
-            borderRadius: "50% 40% 40% 50% / 40% 40% 60% 60%",
-            filter: "blur(1.5px)",
-            animationDelay: "1.9s",
-          }}
-        />
-
-        {/* ── Glass atmosphere — inner starlight pool at jar base ── */}
-        {/* Warm collected light that grows subtly with glowLevel */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute animate-pulse-glow"
-          style={{
-            bottom: "11%",
-            left: "22%",
-            right: "22%",
-            height: "20%",
-            background:
-              `radial-gradient(ellipse at 50% 75%, oklch(0.92 0.15 82 / ${poolA}), oklch(0.87 0.12 320 / ${poolA2}) 55%, transparent 80%)`,
-            filter: "blur(9px)",
-            animationDelay: "2.1s",
-          }}
-        />
       </div>
     </div>
   );
