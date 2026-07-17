@@ -326,6 +326,64 @@ html, body {
 @utility animate-bunny-idle-r   { animation: bunny-idle-r 6.4s ease-in-out infinite; }
 
 /* ════════════════════════════════════════════
+   Casting animation — "Cast into the jar"
+════════════════════════════════════════════ */
+
+/* 1. Star gently pulses awake before flight */
+@keyframes cast-awaken {
+  0%   { transform: scale(1);    filter: brightness(1); }
+  45%  { transform: scale(1.11); filter: brightness(1.40); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+
+/* 2. Star rises toward the jar — slow liftoff, then pulled in */
+@keyframes cast-fly {
+  0%   { transform: translate(0,      0)     scale(1);    opacity: 1; }
+  15%  { transform: translate(-6px,  -7vh)   scale(0.93); opacity: 1; }
+  35%  { transform: translate(5px,  -19vh)   scale(0.74); opacity: 1; }
+  60%  { transform: translate(-4px, -36vh)   scale(0.44); opacity: 1; }
+  82%  { transform: translate(2px,  -48vh)   scale(0.14); opacity: 0.8; }
+  100% { transform: translate(0,    -54vh)   scale(0);    opacity: 0; }
+}
+
+/* 3. Jar brightens when it absorbs the star — uses --ac CSS var for color */
+@keyframes cast-jar-absorb {
+  0%   { filter: brightness(1); }
+  28%  { filter: brightness(1.55) drop-shadow(0 0 28px var(--ac)); }
+  52%  { filter: brightness(2.05) drop-shadow(0 0 55px var(--ac)) drop-shadow(0 0 90px var(--ac)); }
+  76%  { filter: brightness(1.50) drop-shadow(0 0 38px var(--ac)); }
+  100% { filter: brightness(1.18) drop-shadow(0 0 18px var(--ac)); }
+}
+
+/* 4. Colored energy bloom radiates outward from jar */
+@keyframes cast-absorb-bloom {
+  0%   { transform: scale(0.3); opacity: 0; }
+  35%  { transform: scale(1.3); opacity: 1; }
+  70%  { transform: scale(1.9); opacity: 0.5; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* 5. Individual particle bursts outward from jar opening */
+@keyframes cast-particle {
+  0%   { transform: translate(0, 0) scale(1.3); opacity: 1; }
+  40%  { opacity: 0.85; }
+  100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; }
+}
+
+/* 6. Success text gently rises in */
+@keyframes cast-celebrate {
+  0%   { opacity: 0; transform: translateY(26px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@utility animate-cast-awaken       { animation: cast-awaken        0.7s ease-in-out both; }
+@utility animate-cast-fly          { animation: cast-fly           1.7s linear both; }
+@utility animate-cast-jar-absorb   { animation: cast-jar-absorb    0.95s ease-out both; }
+@utility animate-cast-absorb-bloom { animation: cast-absorb-bloom  1.1s ease-out both; }
+@utility animate-cast-particle     { animation: cast-particle       1.3s ease-out both; }
+@utility animate-cast-celebrate    { animation: cast-celebrate      0.85s ease-out both; }
+
+/* ════════════════════════════════════════════
    Theme variants
 ════════════════════════════════════════════ */
 :root[data-theme="rose"] {

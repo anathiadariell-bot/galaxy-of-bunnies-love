@@ -6,6 +6,7 @@ import { CozyRoom } from "@/components/galaxy/CozyRoom";
 import { Header } from "@/components/galaxy/Header";
 import { MusicPlayer } from "@/components/galaxy/MusicPlayer";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
+import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { UpgradeBanner } from "@/components/galaxy/UpgradeBanner";
 import { STAR_COLORS, EMOTIONS, type StarColor } from "@/lib/galaxy";
 import { useCreateStar, useStarLimit } from "@/hooks/useGalaxyData";
@@ -20,6 +21,10 @@ export const Route = createFileRoute("/_authenticated/add-star")({
   component: AddStarPage,
 });
 
+// ─── Types ─────────────────────────────────────────────────────────────────────
+
+type CastPhase = "idle" | "awakening" | "flying" | "absorbed" | "celebrating";
+
 // ─── Static data ───────────────────────────────────────────────────────────────
 
 const COLOR_KEYS = Object.keys(STAR_COLORS) as StarColor[];
@@ -33,7 +38,7 @@ const COLOR_META: Record<StarColor, { label: string; description: string }> = {
   violet: { label: "Violet Dream",  description: "Magical and rare" },
 };
 
-// Accent colours for each emotion card glow — mapped to the existing star palette.
+// Accent colours for each emotion card glow
 const EMOTION_ACCENT: Record<string, string> = {
   love:      STAR_COLORS.rose,
   joy:       STAR_COLORS.gold,
@@ -43,7 +48,7 @@ const EMOTION_ACCENT: Record<string, string> = {
   thanks:    STAR_COLORS.blush,
 };
 
-// Precomputed twinkle dot positions so Math.random() never runs in render.
+// Precomputed twinkle dot positions (no Math.random in render)
 const TWINKLE_DOTS = [
   { top: 18, left: 22, size: 2.5, delay: 0.0 },
   { top: 28, left: 74, size: 2.0, delay: 0.6 },
@@ -55,9 +60,21 @@ const TWINKLE_DOTS = [
   { top: 82, left: 58, size: 2.5, delay: 1.5 },
 ];
 
+// Precomputed burst particles — 12 rays spreading in all directions (deterministic)
+const CAST_PARTICLES = Array.from({ length: 12 }, (_, i) => {
+  const angle = (2 * Math.PI * i) / 12;
+  const r = 55 + (i % 3) * 22; // three rings: 55, 77, 99
+  return {
+    x: Math.round(Math.cos(angle) * r),
+    y: Math.round(Math.sin(angle) * r),
+    size: 6 + (i % 4) * 2,   // 6, 8, 10, 12 px
+    delay: i * 0.035,
+  };
+});
+
 // ─── Shared sub-components ─────────────────────────────────────────────────────
 
-/** Glowing, floating star orb — the live preview used across all steps. */
+/** Glowing star orb — the live preview used across all steps and the casting scene. */
 function StarOrb({
   color,
   size = 140,
@@ -115,7 +132,7 @@ function StarOrb({
   );
 }
 
-/** Four-dot progress indicator with an active pill. */
+/** Four-dot step progress indicator. */
 function StepDots({ current, total = 4 }: { current: number; total?: number }) {
   return (
     <div className="flex items-center gap-2">
@@ -138,6 +155,208 @@ function StepDots({ current, total = 4 }: { current: number; total?: number }) {
   );
 }
 
+// ─── Casting animation scene ───────────────────────────────────────────────────
+
+/**
+ * Full-screen overlay that plays the "star flies into the jar" animation.
+ * Phases: awakening → flying → absorbed → celebrating
+ */
+function CastingScene({
+  activeColor,
+  activeEmotion,
+  title,
+  phase,
+}: {
+  activeColor: string;
+  activeEmotion: (typeof EMOTIONS)[number];
+  title: string;
+  phase: CastPhase;
+}) {
+  const isAwakening  = phase === "awakening";
+  const isFlying     = phase === "flying";
+  const isAbsorbed   = phase === "absorbed";
+  const isCelebrating = phase === "celebrating";
+
+  const showStar     = isAwakening || isFlying;
+  const showAbsorb   = isAbsorbed || isCelebrating;
+  const showParticles = isAbsorbed;
+  const showText     = isCelebrating;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <ThemeBoot />
+      <CozyRoom />
+
+      {/* ── Ambient color wash — deepens during absorption ── */}
+      <div
+        className="pointer-events-none absolute inset-0 transition-opacity duration-700"
+        style={{
+          background: `radial-gradient(ellipse 55% 42% at 50% 28%, ${activeColor}28 0%, transparent 70%)`,
+          opacity: showAbsorb ? 1 : 0.4,
+        }}
+      />
+
+      {/* ── Jar — fixed in upper portion of screen ── */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{ top: "13vh", zIndex: 20 }}
+      >
+        {/* Color bloom that radiates outward on absorption */}
+        {showAbsorb && (
+          <div
+            className="pointer-events-none absolute animate-cast-absorb-bloom rounded-full"
+            style={{
+              inset: "-15%",
+              background: `radial-gradient(circle, ${activeColor}55 0%, ${activeColor}22 50%, transparent 75%)`,
+              zIndex: -1,
+            }}
+          />
+        )}
+
+        {/* Jar with brightening filter on absorption */}
+        <div
+          className={showAbsorb ? "animate-cast-jar-absorb" : ""}
+          style={
+            showAbsorb
+              ? ({ "--ac": activeColor } as React.CSSProperties)
+              : undefined
+          }
+        >
+          <MemoryJar size={220} />
+        </div>
+
+        {/* Burst particles from the jar's cork area */}
+        {showParticles && (
+          <div
+            className="pointer-events-none absolute"
+            style={{ top: "9%", left: "50%" }}
+          >
+            {CAST_PARTICLES.map((p, i) => (
+              <span
+                key={i}
+                className="absolute animate-cast-particle rounded-full"
+                style={
+                  {
+                    "--px": `${p.x}px`,
+                    "--py": `${p.y}px`,
+                    width: p.size,
+                    height: p.size,
+                    marginLeft: -p.size / 2,
+                    marginTop: -p.size / 2,
+                    animationDelay: `${p.delay}s`,
+                    background: activeColor,
+                    boxShadow: `0 0 ${p.size * 2}px ${activeColor}`,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Star — sits below jar, awakens then flies up ── */}
+      {showStar && (
+        <>
+          {/* The orb itself */}
+          <div
+            key={isFlying ? "fly" : "awaken"}
+            className={[
+              "absolute left-1/2 -translate-x-1/2",
+              isFlying ? "animate-cast-fly" : "animate-cast-awaken",
+            ].join(" ")}
+            style={{ top: "63vh", zIndex: 30 }}
+          >
+            <StarOrb color={activeColor} size={140} float={false} />
+          </div>
+
+          {/* Emotion emoji floats just below the orb */}
+          <div
+            className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none text-4xl leading-none transition-opacity duration-300"
+            style={{
+              top: "calc(63vh + 152px)",
+              zIndex: 30,
+              opacity: isFlying ? 0 : 1,
+            }}
+          >
+            {activeEmotion.emoji}
+          </div>
+
+          {/* Soft hint text during awakening */}
+          {isAwakening && (
+            <p
+              className="font-elegant absolute left-1/2 -translate-x-1/2 animate-reveal text-center text-sm text-foreground/45"
+              style={{ top: "calc(63vh + 202px)", zIndex: 30 }}
+            >
+              Your memory is stirring…
+            </p>
+          )}
+        </>
+      )}
+
+      {/* ── Trail of sparkles left behind the flying star ── */}
+      {isFlying && (
+        <div
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+          style={{ top: "63vh", zIndex: 25 }}
+        >
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className="absolute animate-twinkle rounded-full bg-white"
+              style={{
+                width: 4 - i * 0.6,
+                height: 4 - i * 0.6,
+                left: `${48 + (i % 2 === 0 ? 6 : -6)}%`,
+                top: `${20 + i * 28}%`,
+                animationDelay: `${i * 0.18}s`,
+                opacity: 0.7,
+                boxShadow: `0 0 6px ${activeColor}`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ── Success text — appears in celebrating phase ── */}
+      {showText && (
+        <div
+          className="absolute left-1/2 w-full max-w-md -translate-x-1/2 px-6 text-center"
+          style={{ top: "calc(13vh + 290px)", zIndex: 20 }}
+        >
+          {/* Emotion emoji large */}
+          <p
+            className="animate-cast-celebrate text-5xl leading-none"
+            style={{ animationDelay: "0s" }}
+          >
+            {activeEmotion.emoji}
+          </p>
+
+          <h1
+            className="font-display animate-cast-celebrate mt-5 text-5xl text-primary text-glow sm:text-6xl"
+            style={{ animationDelay: "0.18s" }}
+          >
+            Star cast! ✨
+          </h1>
+
+          <p
+            className="font-elegant animate-cast-celebrate mt-3 text-xl text-foreground/70"
+            style={{ animationDelay: "0.36s" }}
+          >
+            "{title}" is now glowing in your jar.
+          </p>
+
+          <p
+            className="font-elegant animate-cast-celebrate mt-2 text-sm text-foreground/40"
+            style={{ animationDelay: "0.54s" }}
+          >
+            Taking you there…
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Page shell ────────────────────────────────────────────────────────────────
 
 function AddStarPage() {
@@ -145,75 +364,72 @@ function AddStarPage() {
   const create = useCreateStar();
   const { allowed, max, reason, isLoading: limitLoading } = useStarLimit();
 
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [emotion, setEmotion] = useState("love");
-  const [color, setColor] = useState<StarColor>("gold");
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
+  const [step, setStep]         = useState<1 | 2 | 3 | 4>(1);
+  const [emotion, setEmotion]   = useState("love");
+  const [color, setColor]       = useState<StarColor>("gold");
+  const [title, setTitle]       = useState("");
+  const [note, setNote]         = useState("");
   const [starredOn, setStarredOn] = useState(
     () => new Date().toISOString().slice(0, 10),
   );
-  const [success, setSuccess] = useState(false);
+  const [castPhase, setCastPhase] = useState<CastPhase>("idle");
 
-  const activeColor = STAR_COLORS[color];
+  const activeColor   = STAR_COLORS[color];
   const activeEmotion = EMOTIONS.find((e) => e.key === emotion)!;
 
-  const cast = async () => {
+  const cast = () => {
     if (!title.trim()) {
       toast.error("Give your star a name first");
       return;
     }
-    try {
-      await create.mutateAsync({
-        title: title.trim(),
-        note: note.trim(),
-        color,
-        emotion,
-        starred_on: starredOn,
-      });
-      setSuccess(true);
-      setTimeout(() => navigate({ to: "/my-jar" }), 2200);
-    } catch (err) {
-      toast.error("Couldn't cast this star", { description: (err as Error).message });
-    }
+
+    // Kick off the animation sequence immediately
+    setCastPhase("awakening");
+    setTimeout(() => setCastPhase("flying"),      700);
+    setTimeout(() => setCastPhase("absorbed"),   2400);
+    setTimeout(() => setCastPhase("celebrating"), 3300);
+
+    // Fire the save at 800 ms (while star is mid-flight) — runs in background
+    const savePromise: Promise<void> = new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        try {
+          await create.mutateAsync({
+            title:      title.trim(),
+            note:       note.trim(),
+            color,
+            emotion,
+            starred_on: starredOn,
+          });
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      }, 800);
+    });
+
+    // Navigate only after the full animation (5 100 ms) + save resolved
+    setTimeout(async () => {
+      try {
+        await savePromise;
+        navigate({ to: "/my-jar" });
+      } catch (err) {
+        toast.error("Couldn't save this memory", {
+          description: (err as Error).message,
+        });
+        setCastPhase("idle"); // return user to the form
+      }
+    }, 5100);
   };
 
-  // ── Success screen ─────────────────────────────────────────────────────────
-  if (success) {
+  // ── Casting animation overlay ───────────────────────────────────────────────
+  if (castPhase !== "idle") {
     return (
-      <div className="relative min-h-screen overflow-hidden">
-        <ThemeBoot />
-        <CozyRoom />
-        <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center">
-          <div className="animate-pixel-pop">
-            <StarOrb color={activeColor} size={200} float={false} />
-          </div>
-          <p
-            className="mt-6 text-5xl animate-reveal"
-            style={{ animationDelay: "0.25s" }}
-          >
-            {activeEmotion.emoji}
-          </p>
-          <h1
-            className="font-display mt-4 text-5xl text-primary text-glow animate-reveal sm:text-6xl"
-            style={{ animationDelay: "0.45s" }}
-          >
-            Star cast! ✨
-          </h1>
-          <p
-            className="font-elegant mt-3 text-xl text-foreground/70 animate-reveal"
-            style={{ animationDelay: "0.65s" }}
-          >
-            "{title}" is now floating in your jar.
-          </p>
-          <p
-            className="font-elegant mt-2 text-sm text-foreground/45 animate-reveal"
-            style={{ animationDelay: "0.85s" }}
-          >
-            Taking you there…
-          </p>
-        </div>
-      </div>
+      <CastingScene
+        activeColor={activeColor}
+        activeEmotion={activeEmotion}
+        title={title}
+        phase={castPhase}
+      />
     );
   }
 
@@ -229,7 +445,6 @@ function AddStarPage() {
 
         {/* ── Nav bar: back + step dots ── */}
         <div className="relative mb-10 flex items-center justify-center animate-reveal">
-          {/* Back button — left-anchored */}
           <div className="absolute left-0">
             {step > 1 ? (
               <button
@@ -247,7 +462,6 @@ function AddStarPage() {
               </Link>
             )}
           </div>
-
           <StepDots current={step} />
         </div>
 
@@ -257,7 +471,6 @@ function AddStarPage() {
             <UpgradeBanner message={reason} />
           </div>
         ) : (
-          /* ── Step content — key forces re-mount → animate-reveal on each step ── */
           <div key={step} className="animate-reveal">
             {step === 1 && (
               <Step1Mood
@@ -334,7 +547,7 @@ function Step1Mood({
 
       <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
         {EMOTIONS.map((e, i) => {
-          const accent = EMOTION_ACCENT[e.key] ?? STAR_COLORS.gold;
+          const accent   = EMOTION_ACCENT[e.key] ?? STAR_COLORS.gold;
           const selected = emotion === e.key;
           return (
             <button
@@ -348,7 +561,6 @@ function Step1Mood({
                   : undefined,
               }}
             >
-              {/* Selected glow fill */}
               {selected && (
                 <div
                   className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -394,9 +606,7 @@ function Step2Color({
         Pick the color that matches this memory.
       </p>
 
-      {/* Live star preview */}
       <div className="mt-10 flex flex-col items-center gap-3">
-        {/* key → re-mount triggers animate-pixel-pop on each color change */}
         <div key={color} className="animate-pixel-pop">
           <StarOrb color={activeColor} size={168} />
         </div>
@@ -408,10 +618,9 @@ function Step2Color({
         </p>
       </div>
 
-      {/* Color swatch row */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-5">
         {COLOR_KEYS.map((k) => {
-          const c = STAR_COLORS[k];
+          const c        = STAR_COLORS[k];
           const selected = k === color;
           return (
             <button
@@ -482,7 +691,7 @@ function Step3Write({
           </p>
         </div>
 
-        {title && (
+        {title ? (
           <div
             className="glass max-w-[210px] rounded-2xl px-5 py-3 text-center transition-all"
             style={{ boxShadow: `0 0 30px ${activeColor}28` }}
@@ -491,9 +700,7 @@ function Step3Write({
               {title}
             </p>
           </div>
-        )}
-
-        {!title && (
+        ) : (
           <p className="font-elegant text-sm text-foreground/35 text-center max-w-[180px]">
             Your star's name will appear here…
           </p>
@@ -511,9 +718,7 @@ function Step3Write({
         </p>
 
         <label className="mt-7 block">
-          <span className="text-xs uppercase tracking-widest text-foreground/65">
-            Title
-          </span>
+          <span className="text-xs uppercase tracking-widest text-foreground/65">Title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -525,9 +730,7 @@ function Step3Write({
         </label>
 
         <label className="mt-5 block">
-          <span className="text-xs uppercase tracking-widest text-foreground/65">
-            Memory
-          </span>
+          <span className="text-xs uppercase tracking-widest text-foreground/65">Memory</span>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -584,7 +787,6 @@ function Step4Cast({
   isPending: boolean;
   onCast: () => void;
 }) {
-  // Format date without timezone shifting
   const formattedDate = new Date(starredOn + "T12:00:00").toLocaleDateString(
     undefined,
     { month: "long", day: "numeric", year: "numeric" },
@@ -600,7 +802,7 @@ function Step4Cast({
         Your star is ready for the jar.
       </p>
 
-      {/* Star + emoji */}
+      {/* Star + emotion */}
       <div className="mt-10 flex flex-col items-center gap-4">
         <StarOrb color={activeColor} size={200} />
         <p className="text-5xl leading-none">{activeEmotion.emoji}</p>
@@ -611,13 +813,9 @@ function Step4Cast({
         className="glass mt-8 rounded-3xl p-7 text-left"
         style={{ boxShadow: `0 0 40px ${activeColor}1a` }}
       >
-        <h2 className="font-display text-3xl text-primary text-glow leading-snug">
-          {title}
-        </h2>
+        <h2 className="font-display text-3xl text-primary text-glow leading-snug">{title}</h2>
         {note && (
-          <p className="font-elegant mt-3 text-base leading-relaxed text-foreground/78">
-            {note}
-          </p>
+          <p className="font-elegant mt-3 text-base leading-relaxed text-foreground/78">{note}</p>
         )}
         <div className="mt-5 flex flex-wrap gap-2">
           <Chip>{activeEmotion.emoji} {activeEmotion.label}</Chip>
