@@ -60,26 +60,66 @@ const TWINKLE_DOTS = [
 // ─── StarOrb (same as send-gift) ─────────────────────────────────────────────
 
 function StarOrb({ color, size = 120 }: { color: string; size?: number }) {
+  // Architecture: replace the large circular orb div with a tiny bright-point core.
+  // The circle boundary of a large orb creates a visible disc because the CozyRoom
+  // background image shows through the transparent interior, contrasting with the
+  // exterior glow. A tiny core (20% of size) fades to transparent well inside its
+  // own border-radius — the circular boundary is invisible. All atmospheric presence
+  // comes from edgeless blurred gradient layers (no border-radius).
+  const core = Math.round(size * 0.2);         // 24 px — tiny bright point
+  const outerSpread = Math.round(size * 1.2);  // outer haze extends this far past the wrapper
+
   return (
     <div
       className="animate-float-y"
-      style={{
-        position: "relative",
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        background: `radial-gradient(circle at 38% 32%, white 0%, ${color} 35%, ${oa(color, 0.53)} 80%)`,
-        boxShadow: [
-          `0 0 ${Math.round(size * 0.25)}px ${color}`,
-          `0 0 ${Math.round(size * 0.6)}px ${oa(color, 0.33)}`,
-          `0 0 ${Math.round(size * 1.2)}px ${oa(color, 0.13)}`,
-        ].join(", "),
-        flexShrink: 0,
-      }}
+      style={{ position: "relative", width: size, height: size, flexShrink: 0 }}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Sparkles style={{ width: size * 0.28, height: size * 0.28, color: "white", opacity: 0.7 }} />
+      {/* ── Outer atmospheric haze: no border-radius, large blur → completely edgeless ── */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: -outerSpread,
+          // Gradient does the shaping; blur dissolves any edge that might remain.
+          background: `radial-gradient(circle at 50% 50%, ${oa(color, 0.6)} 0%, ${oa(color, 0.3)} 18%, ${oa(color, 0.1)} 36%, ${oa(color, 0)} 55%)`,
+          filter: `blur(${Math.round(size * 0.95)}px)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Inner bloom: tighter, less blurred — the "warm glow" zone ── */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: -Math.round(size * 0.35),
+          background: `radial-gradient(circle at 50% 50%, white 0%, ${color} 12%, ${oa(color, 0.35)} 30%, ${oa(color, 0)} 52%)`,
+          filter: `blur(${Math.round(size * 0.22)}px)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Bright-point core: very small circle, fades to transparent at 75% of its own
+              radius — the circular clip is in a fully transparent zone, never perceptible ── */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: core, height: core,
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 45% 42%, white 0%, white 18%, ${color} 48%, ${oa(color, 0)} 75%)`,
+          boxShadow: `0 0 5px 2px white, 0 0 10px ${color}`,
+          zIndex: 1,
+        }}
+      />
+
+      {/* ── Sparkles icon centered in the glow ── */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
+        <Sparkles style={{ width: size * 0.22, height: size * 0.22, color: "white", opacity: 0.8 }} />
       </div>
+
+      {/* ── Twinkle dots scattered in the glow area ── */}
       {TWINKLE_DOTS.map((d, i) => (
         <span
           key={i}
@@ -89,6 +129,7 @@ function StarOrb({ color, size = 120 }: { color: string; size?: number }) {
             width: d.size, height: d.size,
             animationDelay: `${d.delay}s`,
             opacity: 0.85,
+            zIndex: 2,
           }}
         />
       ))}
