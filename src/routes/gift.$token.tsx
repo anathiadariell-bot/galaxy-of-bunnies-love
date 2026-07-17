@@ -7,6 +7,15 @@ import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
 import { STAR_COLORS, EMOTIONS, type StarColor, type Emotion } from "@/lib/galaxy";
 import { supabase } from "@/integrations/supabase/client";
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// STAR_COLORS values are oklch functional strings, e.g. "oklch(0.85 0.13 20)".
+// Appending hex digits like `${color}88` produces invalid CSS that browsers drop.
+// This helper inserts the alpha properly: oklch(L C H) → oklch(L C H / alpha).
+function oa(color: string, alpha: number): string {
+  return color.replace(")", ` / ${alpha})`);
+}
+
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute("/gift/$token")({
@@ -59,11 +68,11 @@ function StarOrb({ color, size = 120 }: { color: string; size?: number }) {
         width: size,
         height: size,
         borderRadius: "50%",
-        background: `radial-gradient(circle at 38% 32%, white 0%, ${color} 35%, ${color}88 80%)`,
+        background: `radial-gradient(circle at 38% 32%, white 0%, ${color} 35%, ${oa(color, 0.53)} 80%)`,
         boxShadow: [
           `0 0 ${Math.round(size * 0.25)}px ${color}`,
-          `0 0 ${Math.round(size * 0.6)}px ${color}55`,
-          `0 0 ${Math.round(size * 1.2)}px ${color}22`,
+          `0 0 ${Math.round(size * 0.6)}px ${oa(color, 0.33)}`,
+          `0 0 ${Math.round(size * 1.2)}px ${oa(color, 0.13)}`,
         ].join(", "),
         flexShrink: 0,
       }}
@@ -100,7 +109,7 @@ function Shell({ color, children }: { color: string; children: React.ReactNode }
       <div
         className="pointer-events-none fixed inset-0 transition-all duration-700"
         style={{
-          background: `radial-gradient(ellipse 60% 50% at 50% 30%, ${color}18 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse 60% 50% at 50% 30%, ${oa(color, 0.09)} 0%, transparent 70%)`,
         }}
       />
 
@@ -328,9 +337,9 @@ function GiftPage() {
             disabled={pinChecking || pin.trim().length === 0}
             className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
             style={{
-              background: `linear-gradient(135deg, ${activeColor}cc 0%, ${activeColor} 100%)`,
+              background: `linear-gradient(135deg, ${oa(activeColor, 0.8)} 0%, ${activeColor} 100%)`,
               color: "white",
-              boxShadow: `0 4px 16px ${activeColor}44`,
+              boxShadow: `0 4px 16px ${oa(activeColor, 0.27)}`,
             }}
           >
             {pinChecking ? (
