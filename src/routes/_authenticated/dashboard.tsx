@@ -8,7 +8,7 @@ import bunnyHer from "@/assets/bunny-her-pixel.png";
 import bunnyHim from "@/assets/bunny-him-pixel.png";
 import {
   Star as StarIcon, Image as ImageIcon, Video, Mic,
-  Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles,
+  Mail, Trophy, CalendarHeart, Plus, LogOut, PenLine, Sparkles, Gift,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -200,6 +200,12 @@ function DashboardPage() {
             className="font-elegant glass inline-flex items-center gap-2 rounded-full px-5 py-3 text-lg text-foreground/85 transition hover:bg-white/15"
           >
             <PenLine className="h-4 w-4 not-italic text-accent" /> Write a Letter
+          </Link>
+          <Link
+            to="/send-gift"
+            className="font-elegant glass inline-flex items-center gap-2 rounded-full px-5 py-3 text-lg text-foreground/85 transition hover:bg-white/15"
+          >
+            <Gift className="h-4 w-4 not-italic" style={{ color: STAR_COLORS.gold }} /> Send a Gift Star ✨
           </Link>
           <button
             onClick={signOut}
