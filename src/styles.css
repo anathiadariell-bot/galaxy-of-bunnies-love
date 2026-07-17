@@ -510,6 +510,66 @@ html, body {
   --shadow-glow:      0 0 40px oklch(0.82 0.14 152 / 0.35);
   --shadow-pixel-gold: 3px 3px 0px oklch(0.44 0.12 152);
 }
+/* ════════════════════════════════════════════
+   Gift star public page — opening intro sequence
+════════════════════════════════════════════ */
+
+/* 1. Star materialises from nothing */
+@keyframes gift-appear {
+  0%   { opacity: 0; transform: scale(0.18); filter: brightness(0.4); }
+  55%  { opacity: 1; transform: scale(1.12); filter: brightness(1.7); }
+  100% { opacity: 1; transform: scale(1);    filter: brightness(1);   }
+}
+
+/* 2. Star wakes up — surges brighter before launching */
+@keyframes gift-wake {
+  0%   { transform: scale(1);    filter: brightness(1);    }
+  35%  { transform: scale(1.18); filter: brightness(1.80); }
+  58%  { transform: scale(1.28); filter: brightness(2.55); }
+  78%  { transform: scale(1.20); filter: brightness(2.00); }
+  100% { transform: scale(1.12); filter: brightness(1.55); }
+}
+
+/* 3. Star sweeps a curved arc downward toward the message area.
+      filter starts at 1.5 to match where gift-wake left off (avoids flash). */
+@keyframes gift-arc {
+  0%   { transform: translate(  0px,  0  )  scale(1.12); filter: brightness(1.5); }
+  14%  { transform: translate( 28px,  5vh)  scale(1.07); filter: brightness(1.3); }
+  35%  { transform: translate(-14px, 13vh)  scale(1.00); filter: brightness(1.1); }
+  58%  { transform: translate( 22px, 22vh)  scale(0.93); filter: brightness(1.0); }
+  82%  { transform: translate(  4px, 28vh)  scale(0.95); filter: brightness(1.0); }
+  100% { transform: translate(  0px, 30vh)  scale(0.96); filter: brightness(1.0); }
+}
+
+/* 4. Flash burst when the star reaches the message */
+@keyframes gift-burst-flash {
+  0%   { transform: scale(1);   opacity: 1;    filter: brightness(1.5);             }
+  25%  { transform: scale(3.2); opacity: 1;    filter: brightness(5) saturate(1.6); }
+  60%  { transform: scale(6);   opacity: 0.45; filter: brightness(2.5);             }
+  100% { transform: scale(9);   opacity: 0;    filter: brightness(1);               }
+}
+
+/* 5. Individual burst particles fly outward */
+@keyframes gift-burst-particle {
+  0%   { transform: translate(0, 0) scale(1.3); opacity: 1;  }
+  40%  { opacity: 0.85; }
+  100% { transform: translate(var(--bx), var(--by)) scale(0); opacity: 0; }
+}
+
+/* 6. Sparkle trail dot appears and fades */
+@keyframes gift-trail-dot {
+  0%   { opacity: 0; transform: scale(0.2); }
+  20%  { opacity: 1; transform: scale(1.1); }
+  65%  { opacity: 0.5; }
+  100% { opacity: 0;  transform: scale(0.2); }
+}
+
+/* 7. Gift content fades and rises in after the burst */
+@keyframes gift-content-reveal {
+  0%   { opacity: 0; transform: translateY(22px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
 :root[data-theme="vanilla"] {
   --primary:          oklch(0.88 0.10 72);
   --accent:           oklch(0.80 0.10 48);
