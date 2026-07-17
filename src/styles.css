@@ -306,6 +306,45 @@ html, body {
   90%        { transform: translateY(-7px) rotate(0.5deg);  }
 }
 
+/* ── Bunny happy jump — one-shot when a new star enters the jar ── */
+/* Left bunny (her): leans left on ascent, right on descent */
+@keyframes bunny-happy-jump {
+  0%   { transform: translateY(0)     rotate(0deg)  scaleX(1);    }
+  15%  { transform: translateY(-20px) rotate(-5deg) scaleX(0.93); }
+  32%  { transform: translateY(-34px) rotate(-2deg) scaleX(1);    }
+  50%  { transform: translateY(-14px) rotate(4deg)  scaleX(1.06); }
+  63%  { transform: translateY(0)     rotate(0deg)  scaleX(0.88); } /* squish on landing */
+  74%  { transform: translateY(-12px) rotate(-2deg) scaleX(1);    } /* bounce */
+  84%  { transform: translateY(0)     rotate(0deg)  scaleX(0.96); }
+  92%  { transform: translateY(-4px)  rotate(0deg)  scaleX(1);    } /* tiny final hop */
+  100% { transform: translateY(0)     rotate(0deg)  scaleX(1);    }
+}
+/* Right bunny (him): mirror rotations */
+@keyframes bunny-happy-jump-r {
+  0%   { transform: translateY(0)     rotate(0deg)  scaleX(1);    }
+  15%  { transform: translateY(-20px) rotate(5deg)  scaleX(0.93); }
+  32%  { transform: translateY(-34px) rotate(2deg)  scaleX(1);    }
+  50%  { transform: translateY(-14px) rotate(-4deg) scaleX(1.06); }
+  63%  { transform: translateY(0)     rotate(0deg)  scaleX(0.88); }
+  74%  { transform: translateY(-12px) rotate(2deg)  scaleX(1);    }
+  84%  { transform: translateY(0)     rotate(0deg)  scaleX(0.96); }
+  92%  { transform: translateY(-4px)  rotate(0deg)  scaleX(1);    }
+  100% { transform: translateY(0)     rotate(0deg)  scaleX(1);    }
+}
+
+/* ── Celebration particle: drifts upward from bunny, fades out ── */
+/* --cpx controls horizontal drift per particle (set via inline style) */
+@keyframes bunny-celebrate-particle {
+  0%   { opacity: 0;    transform: translate(0, 0)                    scale(0.3); }
+  20%  { opacity: 1;    transform: translate(var(--cpx, 0px), -16px)  scale(1.15); }
+  65%  { opacity: 0.72; transform: translate(var(--cpx, 0px), -54px)  scale(0.85); }
+  100% { opacity: 0;    transform: translate(var(--cpx, 0px), -88px)  scale(0.4); }
+}
+
+@utility animate-bunny-happy-jump   { animation: bunny-happy-jump   1.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+@utility animate-bunny-happy-jump-r { animation: bunny-happy-jump-r 1.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+@utility animate-bunny-celebrate    { animation: bunny-celebrate-particle 1.45s ease-out both; }
+
 @utility animate-twinkle        { animation: twinkle 3.5s ease-in-out infinite; }
 @utility animate-drift          { animation: drift 60s ease-in-out infinite alternate; }
 @utility animate-drift-slow     { animation: drift-slow 90s ease-in-out infinite; }

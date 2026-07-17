@@ -9,6 +9,8 @@ import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { useStars } from "@/hooks/useGalaxyData";
 import type { Star } from "@/hooks/useGalaxyData";
 import { STAR_COLORS, type StarColor, EMOTIONS } from "@/lib/galaxy";
+import bunnyHer from "@/assets/bunny-her-pixel.png";
+import bunnyHim from "@/assets/bunny-him-pixel.png";
 
 export const Route = createFileRoute("/_authenticated/my-jar")({
   head: () => ({
@@ -132,6 +134,89 @@ function StarOrb({
   );
 }
 
+// ─── Bunny celebration ─────────────────────────────────────────────────────────
+
+// Deterministic particle set — no Math.random, SSR-safe.
+// --cpx drives per-particle horizontal drift (set as inline CSS var).
+const CELEBRATE_PARTICLES = [
+  { cpx: "-14px", delay: 0.00, symbol: "♥", color: "oklch(0.82 0.15 8)"   },
+  { cpx:  "16px", delay: 0.12, symbol: "✦", color: "oklch(0.92 0.16 90)"  },
+  { cpx:  "-7px", delay: 0.24, symbol: "♥", color: "oklch(0.88 0.13 350)" },
+  { cpx:  "22px", delay: 0.08, symbol: "✦", color: "oklch(0.85 0.10 240)" },
+  { cpx: "-20px", delay: 0.32, symbol: "♥", color: "oklch(0.86 0.13 82)"  },
+  { cpx:   "8px", delay: 0.18, symbol: "✦", color: "oklch(0.87 0.11 290)" },
+] as const;
+
+/**
+ * Bunny sprite that idles normally and does a one-shot joyful jump (with
+ * floating hearts/sparkles) whenever `isArriving` flips to true.
+ * The sprite image is never modified — only CSS transforms are applied.
+ */
+function BunnyReaction({
+  src,
+  side,
+  isArriving,
+  idleClass,
+}: {
+  src: string;
+  side: "left" | "right";
+  isArriving: boolean;
+  idleClass: string;
+}) {
+  const jumpClass =
+    side === "left" ? "animate-bunny-happy-jump" : "animate-bunny-happy-jump-r";
+
+  return (
+    <div
+      className="pointer-events-none absolute select-none"
+      style={{
+        [side]: "3%",
+        bottom: "5%",
+        width: "clamp(50px, 9%, 72px)",
+        zIndex: 5,
+      }}
+    >
+      {/* Floating hearts & sparkles — only rendered during arrival */}
+      {isArriving && CELEBRATE_PARTICLES.map((p, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="animate-bunny-celebrate absolute left-1/2 bottom-full -translate-x-1/2"
+          style={{
+            "--cpx": p.cpx,
+            animationDelay: `${p.delay}s`,
+            fontSize: "clamp(9px, 1.4vw, 14px)",
+            color: p.color,
+            lineHeight: 1,
+            filter:    `drop-shadow(0 0 3px ${p.color})`,
+            textShadow: `0 0 6px ${p.color}`,
+            whiteSpace: "nowrap",
+          } as React.CSSProperties}
+        >
+          {p.symbol}
+        </span>
+      ))}
+
+      {/* Bunny sprite — same asset as dashboard, only animation class changes */}
+      <img
+        src={src}
+        alt=""
+        aria-hidden
+        className={isArriving ? jumpClass : idleClass}
+        style={{
+          imageRendering: "pixelated",
+          width: "100%",
+          filter: [
+            "drop-shadow(2px 2px 0px oklch(0.08 0.03 255 / 0.75))",
+            "drop-shadow(0 0 14px oklch(0.90 0.15 78 / 0.42))",
+            "drop-shadow(0 0 6px oklch(0.74 0.09 8 / 0.22))",
+          ].join(" "),
+        }}
+      />
+    </div>
+  );
+}
+
 // ─── Jar scene ─────────────────────────────────────────────────────────────────
 
 /**
@@ -192,6 +277,20 @@ function JarScene({
           <MemoryJar size={230} glowLevel={glowLevel} />
         </div>
       </div>
+
+      {/* ── Bunny reactions — flank the jar, jump when a star arrives ── */}
+      <BunnyReaction
+        src={bunnyHer}
+        side="left"
+        isArriving={isArriving}
+        idleClass="animate-bunny-idle"
+      />
+      <BunnyReaction
+        src={bunnyHim}
+        side="right"
+        isArriving={isArriving}
+        idleClass="animate-bunny-idle-r"
+      />
 
       {/* Orbiting stars */}
       {stars.map((s, i) => {
