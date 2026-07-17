@@ -455,7 +455,7 @@ function SendGiftPage() {
 
         {/* ── Color picker ──────────────────────────────────────────────────── */}
         <Section title="Choose a colour">
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-y-5 gap-x-2">
             {ALL_COLORS.map((c) => {
               const isAvailable = (allowedColors as string[]).includes(c);
               const isSelected  = color === c;
@@ -466,41 +466,110 @@ function SendGiftPage() {
                   key={c}
                   disabled={!isAvailable}
                   onClick={() => isAvailable && setColor(c)}
-                  className="relative flex flex-col items-center gap-2 rounded-xl py-3 text-center transition-all duration-200 active:scale-95"
+                  className="relative flex flex-col items-center gap-2.5 text-center"
                   style={{
-                    background: isSelected
-                      ? `${hex}28`
-                      : "oklch(1 0 0 / 0.04)",
-                    border: `1.5px solid ${isSelected ? hex : "oklch(1 0 0 / 0.10)"}`,
-                    opacity: isAvailable ? 1 : 0.45,
+                    opacity: isAvailable ? 1 : 0.38,
                     cursor: isAvailable ? "pointer" : "default",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
                   }}
                 >
-                  {/* Swatch */}
+                  {/* Orb + halo wrapper */}
                   <div
-                    className="rounded-full"
                     style={{
-                      width: 28, height: 28,
-                      background: `radial-gradient(circle at 38% 32%, white 0%, ${hex} 45%, ${hex}88 100%)`,
-                      boxShadow: isSelected ? `0 0 10px ${hex}88` : undefined,
+                      position: "relative",
+                      width: 64,
+                      height: 64,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "transform 0.22s cubic-bezier(0.34,1.56,0.64,1)",
+                      transform: isSelected ? "scale(1.18)" : "scale(1)",
                     }}
-                  />
-                  <span className="text-xs font-medium text-foreground/75">
+                  >
+                    {/* Halo rings */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        borderRadius: "50%",
+                        boxShadow: isSelected
+                          ? `0 0 0 3px ${hex}55, 0 0 18px 6px ${hex}66, 0 0 36px 12px ${hex}33`
+                          : "none",
+                        transition: "box-shadow 0.25s ease",
+                      }}
+                    />
+
+                    {/* Star orb swatch */}
+                    <div
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: "50%",
+                        background: `radial-gradient(circle at 36% 30%, white 0%, ${hex} 38%, ${hex}99 72%, ${hex}44 100%)`,
+                        boxShadow: isSelected
+                          ? `0 0 12px ${hex}, 0 0 28px ${hex}88, inset 0 1px 0 oklch(1 0 0 / 0.5)`
+                          : `0 0 6px ${hex}55, inset 0 1px 0 oklch(1 0 0 / 0.35)`,
+                        transition: "box-shadow 0.25s ease",
+                        position: "relative",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {/* Inner sparkle */}
+                      <Sparkles
+                        style={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: 16,
+                          height: 16,
+                          color: "white",
+                          opacity: isSelected ? 0.9 : 0.4,
+                          transition: "opacity 0.2s ease",
+                        }}
+                      />
+                    </div>
+
+                    {/* Lock badge */}
+                    {!isAvailable && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 2,
+                          right: 2,
+                          width: 18,
+                          height: 18,
+                          borderRadius: "50%",
+                          background: "oklch(0.15 0.02 255 / 0.85)",
+                          border: "1px solid oklch(1 0 0 / 0.15)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Lock size={9} className="text-foreground/55" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Label */}
+                  <span
+                    className="text-xs font-semibold tracking-wide"
+                    style={{
+                      color: isSelected ? hex : "oklch(1 0 0 / 0.50)",
+                      transition: "color 0.2s ease",
+                    }}
+                  >
                     {COLOR_META[c].label.split(" ")[0]}
                   </span>
-
-                  {/* Lock overlay for premium-only */}
-                  {!isAvailable && (
-                    <div className="absolute inset-0 flex items-end justify-center rounded-xl pb-1.5">
-                      <Lock size={10} className="text-foreground/40" />
-                    </div>
-                  )}
                 </button>
               );
             })}
           </div>
           {plan === "free" && (
-            <p className="mt-3 text-center text-xs text-foreground/35">
+            <p className="mt-4 text-center text-xs text-foreground/35">
               Sage, Blush, and Violet are{" "}
               <span style={{ color: "oklch(0.82 0.13 300)" }}>Premium</span> colours.
             </p>
