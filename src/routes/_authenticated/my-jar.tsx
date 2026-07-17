@@ -149,30 +149,19 @@ const CELEBRATE_PARTICLES = [
 
 /**
  * Bunny sprite that idles normally and does a one-shot joyful jump (with
- * floating hearts/sparkles + a temporary pixel-art happy face overlay) whenever
- * `isArriving` flips to true.
- *
- * The sprite image is NEVER modified — only CSS transforms and a layered SVG
- * overlay are applied. The face sits on the back of the head (both sprites face
- * away from the viewer), which is a classic chibi 4th-wall trope.
- *
- * eyeColor  — stroke colour for the ∩ happy-eye arcs (contrasts with fur)
- * noseColor — fill colour for the tiny nose dot
+ * floating hearts/sparkles) whenever `isArriving` flips to true.
+ * The sprite image is never modified — only CSS transforms are applied.
  */
 function BunnyReaction({
   src,
   side,
   isArriving,
   idleClass,
-  eyeColor,
-  noseColor,
 }: {
   src: string;
   side: "left" | "right";
   isArriving: boolean;
   idleClass: string;
-  eyeColor: string;
-  noseColor: string;
 }) {
   const jumpClass =
     side === "left" ? "animate-bunny-happy-jump" : "animate-bunny-happy-jump-r";
@@ -225,51 +214,6 @@ function BunnyReaction({
         }}
       />
 
-      {/*
-        ── Happy face overlay ──────────────────────────────────────────────────
-        Positioned over the back of the head (both sprites face away).
-        top 29% ≈ the round head centre in the 1:1 sprite canvas.
-        A tiny SVG draws two ∩ closed-arc eyes + a dot nose, pixel-art style.
-        React unmounts it when isArriving → false, so it never shows at idle.
-      */}
-      {isArriving && (
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: "29%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "44%",
-            zIndex: 10,
-          }}
-        >
-          <svg
-            className="animate-bunny-face w-full"
-            viewBox="0 0 14 10"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ overflow: "visible" }}
-          >
-            {/* Left happy eye — ∩ arc */}
-            <path
-              d="M1 6 Q3.5 2.5 6 6"
-              stroke={eyeColor}
-              strokeWidth="1.7"
-              strokeLinecap="round"
-            />
-            {/* Right happy eye — ∩ arc */}
-            <path
-              d="M8 6 Q10.5 2.5 13 6"
-              stroke={eyeColor}
-              strokeWidth="1.7"
-              strokeLinecap="round"
-            />
-            {/* Tiny nose */}
-            <circle cx="7" cy="8.4" r="1.05" fill={noseColor} />
-          </svg>
-        </div>
-      )}
     </div>
   );
 }
@@ -336,23 +280,17 @@ function JarScene({
       </div>
 
       {/* ── Bunny reactions — flank the jar, jump when a star arrives ── */}
-      {/* Her (white fur): dark-brown eyes contrast on cream, pink nose matches inner ears */}
       <BunnyReaction
         src={bunnyHer}
         side="left"
         isArriving={isArriving}
         idleClass="animate-bunny-idle"
-        eyeColor="#3d1505"
-        noseColor="#e8909a"
       />
-      {/* Him (dark-brown fur): warm-cream eyes visible on dark fur, tan nose */}
       <BunnyReaction
         src={bunnyHim}
         side="right"
         isArriving={isArriving}
         idleClass="animate-bunny-idle-r"
-        eyeColor="#f2ddb8"
-        noseColor="#c8987a"
       />
 
       {/* Orbiting stars */}

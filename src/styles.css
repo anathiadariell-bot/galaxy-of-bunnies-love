@@ -332,15 +332,6 @@ html, body {
   100% { transform: translateX(0)   translateY(0)     rotate(0deg)  scaleX(1);    }
 }
 
-/* ── Happy face overlay — pops in, stays, fades out before flag resets ── */
-@keyframes bunny-face-appear {
-  0%   { opacity: 0; transform: scale(0.4); }
-  20%  { opacity: 1; transform: scale(1.14); }
-  38%  { opacity: 1; transform: scale(1.0);  }
-  78%  { opacity: 1; transform: scale(1.0);  }
-  100% { opacity: 0; transform: scale(0.7);  }
-}
-@utility animate-bunny-face { animation: bunny-face-appear 1.6s ease-out both; }
 
 /* ── Celebration particle: drifts upward from bunny, fades out ── */
 /* --cpx controls horizontal drift per particle (set via inline style) */
