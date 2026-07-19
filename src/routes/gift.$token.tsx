@@ -192,6 +192,138 @@ function Shell({ color, children }: { color: string; children: React.ReactNode }
   );
 }
 
+// ─── CuteStarCharacter — pixel-art star with a simple face ───────────────────
+//
+// Design language matches the pixel bunny art: dark warm-brown outline,
+// soft highlight sheen in the upper-left, tiny pixel-rect eyes, minimal smile.
+// Glow layers use the same edgeless-blur technique as StarOrb so the character
+// sits on the night-sky background without a visible disc edge.
+
+function CuteStarCharacter({
+  color,
+  size = 120,
+  phase,
+}: {
+  color: string;
+  size?: number;
+  phase: Exclude<OpenPhase, "revealed">;
+}) {
+  const sleeping = phase === "intro";
+  const waking   = phase === "wake";
+
+  // Eye-open animation: applied only during the wake hop so it plays once.
+  const eyeAnim = (delay = "0s"): React.CSSProperties => ({
+    animation: `gift-eye-open 0.35s cubic-bezier(0.34,1.56,0.64,1) ${delay} both`,
+    transformBox: "fill-box",
+    transformOrigin: "center",
+  });
+
+  return (
+    // Gentle float during intro / wake; the arc animation on the parent
+    // motion-div controls position during the arc phase so we omit it there.
+    <div
+      className={sleeping || waking ? "animate-float-y" : undefined}
+      style={{ position: "relative", width: size, height: size }}
+    >
+      {/* ── Atmospheric glow — edgeless blur, no visible circle boundary ── */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: -Math.round(size * 0.72),
+          background: `radial-gradient(circle at 50% 50%,
+            ${oa(color, 0.55)} 0%,
+            ${oa(color, 0.26)} 22%,
+            ${oa(color, 0.08)} 40%,
+            ${oa(color, 0   )} 56%)`,
+          filter: `blur(${Math.round(size * 0.65)}px)`,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: -Math.round(size * 0.18),
+          background: `radial-gradient(circle at 48% 44%,
+            white          0%,
+            ${color}       14%,
+            ${oa(color, 0.22)} 32%,
+            ${oa(color, 0   )} 52%)`,
+          filter: `blur(${Math.round(size * 0.12)}px)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── SVG star character ── */}
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 100 100"
+        style={{ position: "relative", zIndex: 1, overflow: "visible" }}
+        aria-hidden
+      >
+        {/* Five-point star body — R=45, r=19, center=(50,50), pointing up.
+            strokeLinejoin="round" softens the tips slightly, like the bunnies'
+            rounded-pixel outlines. */}
+        <polygon
+          points="50,5 61.2,34.6 92.8,36.1 68.1,55.9 76.5,86.4 50,69 23.5,86.4 31.9,55.9 7.2,36.1 38.8,34.6"
+          fill={color}
+          stroke="#2a1808"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+
+        {/* Shine — soft ellipse in the upper-left of the body, same as the
+            white sheen on the pixel bunnies */}
+        <ellipse
+          cx="37" cy="25" rx="8" ry="5"
+          fill="white" opacity="0.28"
+          transform="rotate(-30 37 25)"
+        />
+
+        {/* ── Face ── */}
+        {sleeping ? (
+          // Sleeping eyes: two short pixel dashes, like the classic "—" closed eye
+          <g opacity="0.82">
+            <line x1="43" y1="49" x2="47" y2="49"
+              stroke="#2a1808" strokeWidth="2.2" strokeLinecap="round" />
+            <line x1="53" y1="49" x2="57" y2="49"
+              stroke="#2a1808" strokeWidth="2.2" strokeLinecap="round" />
+          </g>
+        ) : (
+          <g>
+            {/* Eyes — small filled rectangles (pixel-art style), slightly
+                spring-animated when first opening during the wake phase */}
+            <rect x="43" y="44" width="4.5" height="5" rx="1"
+              fill="#2a1808"
+              style={waking ? eyeAnim("0s") : undefined}
+            />
+            <rect x="53" y="44" width="4.5" height="5" rx="1"
+              fill="#2a1808"
+              style={waking ? eyeAnim("0.04s") : undefined}
+            />
+            {/* Tiny white glints — top-left corner of each eye */}
+            <rect x="44"   y="45" width="1.5" height="1.5" fill="white" opacity="0.95" />
+            <rect x="54"   y="45" width="1.5" height="1.5" fill="white" opacity="0.95" />
+
+            {/* Smile — small curved path, intentionally subtle */}
+            <path
+              d="M 45,57 Q 50,61 55,57"
+              fill="none" stroke="#2a1808"
+              strokeWidth="2" strokeLinecap="round"
+            />
+
+            {/* Blush cheeks — soft pink ovals, low opacity */}
+            <ellipse cx="39" cy="54" rx="5" ry="3" fill="#ffaaaa" opacity="0.38" />
+            <ellipse cx="61" cy="54" rx="5" ry="3" fill="#ffaaaa" opacity="0.38" />
+          </g>
+        )}
+      </svg>
+    </div>
+  );
+}
+
 // ─── Intro overlay ────────────────────────────────────────────────────────────
 
 /**
@@ -223,15 +355,15 @@ function GiftIntroOverlay({
         overflow: "hidden",
       }}
     >
-      {/* ── Animated star (hidden during burst) ── */}
+      {/* ── Animated star character (hidden during burst) ── */}
       {phase !== "burst" && (
         // Anchor: reference point at the viewport centre
         <div style={{ position: "absolute", top: "50%", left: "50%" }}>
-          {/* Centering: aligns the 140 × 140 StarOrb centre with the anchor */}
+          {/* Centering: aligns the 120 × 120 character centre with the anchor */}
           <div style={{ transform: "translate(-50%, -50%)" }}>
-            {/* Motion: animation translates from (0,0) = centred position */}
+            {/* Motion: animation translates/rotates from (0,0) = centred position */}
             <div style={{ animation: starAnimation }}>
-              <StarOrb color={color} size={140} />
+              <CuteStarCharacter color={color} size={120} phase={phase} />
             </div>
           </div>
         </div>

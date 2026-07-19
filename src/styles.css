@@ -521,24 +521,32 @@ html, body {
   100% { opacity: 1; transform: scale(1);    filter: brightness(1);   }
 }
 
-/* 2. Star wakes up — surges brighter before launching */
+/* 2. Star wakes up — hops upward, surges brighter, settles before launching */
 @keyframes gift-wake {
-  0%   { transform: scale(1);    filter: brightness(1);    }
-  35%  { transform: scale(1.18); filter: brightness(1.80); }
-  58%  { transform: scale(1.28); filter: brightness(2.55); }
-  78%  { transform: scale(1.20); filter: brightness(2.00); }
-  100% { transform: scale(1.12); filter: brightness(1.55); }
+  0%   { transform: scale(1)    translateY(  0px); filter: brightness(1);    }
+  35%  { transform: scale(1.18) translateY( -8px); filter: brightness(1.80); }
+  58%  { transform: scale(1.28) translateY(-14px); filter: brightness(2.55); }
+  78%  { transform: scale(1.20) translateY( -8px); filter: brightness(2.00); }
+  100% { transform: scale(1.12) translateY(  0px); filter: brightness(1.55); }
 }
 
-/* 3. Star sweeps a curved arc downward toward the message area.
-      filter starts at 1.5 to match where gift-wake left off (avoids flash). */
+/* 2b. Character's eyes snap open during the wake hop */
+@keyframes gift-eye-open {
+  0%   { transform: scaleY(0.05); }
+  55%  { transform: scaleY(1.25); }
+  100% { transform: scaleY(1);    }
+}
+
+/* 3. Star sweeps a curved arc downward, rotating as it goes — like a little
+      character waddling through the air. filter starts at 1.5 to match where
+      gift-wake left off (avoids brightness flash on phase change). */
 @keyframes gift-arc {
-  0%   { transform: translate(  0px,  0  )  scale(1.12); filter: brightness(1.5); }
-  14%  { transform: translate( 28px,  5vh)  scale(1.07); filter: brightness(1.3); }
-  35%  { transform: translate(-14px, 13vh)  scale(1.00); filter: brightness(1.1); }
-  58%  { transform: translate( 22px, 22vh)  scale(0.93); filter: brightness(1.0); }
-  82%  { transform: translate(  4px, 28vh)  scale(0.95); filter: brightness(1.0); }
-  100% { transform: translate(  0px, 30vh)  scale(0.96); filter: brightness(1.0); }
+  0%   { transform: translate(  0px,  0  ) scale(1.12) rotate(  0deg); filter: brightness(1.5); }
+  14%  { transform: translate( 28px,  5vh) scale(1.07) rotate( 10deg); filter: brightness(1.3); }
+  35%  { transform: translate(-14px, 13vh) scale(1.00) rotate( -7deg); filter: brightness(1.1); }
+  58%  { transform: translate( 22px, 22vh) scale(0.93) rotate(  8deg); filter: brightness(1.0); }
+  82%  { transform: translate(  4px, 28vh) scale(0.95) rotate( -4deg); filter: brightness(1.0); }
+  100% { transform: translate(  0px, 30vh) scale(0.96) rotate(  0deg); filter: brightness(1.0); }
 }
 
 /* 4. Flash burst when the star reaches the message */
