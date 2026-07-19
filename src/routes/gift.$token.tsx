@@ -6,6 +6,7 @@ import { Header } from "@/components/galaxy/Header";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
 import { STAR_COLORS, EMOTIONS, type StarColor, type Emotion } from "@/lib/galaxy";
 import { supabase } from "@/integrations/supabase/client";
+import bunnyHer from "@/assets/bunny-her-pixel.png";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -192,12 +193,14 @@ function Shell({ color, children }: { color: string; children: React.ReactNode }
   );
 }
 
-// ─── CuteStarCharacter — pixel-art star with a simple face ───────────────────
+// ─── CuteStarCharacter — chubby cozy pixel-art star (Animal Crossing × Stardew) ──
 //
-// Design language matches the pixel bunny art: dark warm-brown outline,
-// soft highlight sheen in the upper-left, tiny pixel-rect eyes, minimal smile.
-// Glow layers use the same edgeless-blur technique as StarOrb so the character
-// sits on the night-sky background without a visible disc edge.
+// Chubby five-point star (R=43, r=24 — inner radius 56% of outer vs. the standard
+// 38%, giving it puffier tips). Big sclera eyes with dark pupils and white glints,
+// sleeping dash-eyes, spring-open on wake, wink on the right eye mid-wake, wide
+// smile, generous pink cheeks. Layered SVG shading (highlight + shadow + pixel
+// sparkle chunks) matches the bunny sprite style. Glow uses the same edgeless-blur
+// approach as StarOrb so the character floats cleanly on the night-sky background.
 
 function CuteStarCharacter({
   color,
@@ -211,113 +214,141 @@ function CuteStarCharacter({
   const sleeping = phase === "intro";
   const waking   = phase === "wake";
 
-  // Eye-open animation: applied only during the wake hop so it plays once.
-  const eyeAnim = (delay = "0s"): React.CSSProperties => ({
-    animation: `gift-eye-open 0.35s cubic-bezier(0.34,1.56,0.64,1) ${delay} both`,
-    transformBox: "fill-box",
+  // Shared transform props for SVG element animations (scaleY needs fill-box).
+  const pivot: React.CSSProperties = {
+    transformBox:    "fill-box",
     transformOrigin: "center",
-  });
+  };
 
   return (
-    // Gentle float during intro / wake; the arc animation on the parent
-    // motion-div controls position during the arc phase so we omit it there.
     <div
       className={sleeping || waking ? "animate-float-y" : undefined}
       style={{ position: "relative", width: size, height: size }}
     >
-      {/* ── Atmospheric glow — edgeless blur, no visible circle boundary ── */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: -Math.round(size * 0.72),
-          background: `radial-gradient(circle at 50% 50%,
-            ${oa(color, 0.55)} 0%,
-            ${oa(color, 0.26)} 22%,
-            ${oa(color, 0.08)} 40%,
-            ${oa(color, 0   )} 56%)`,
-          filter: `blur(${Math.round(size * 0.65)}px)`,
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: -Math.round(size * 0.18),
-          background: `radial-gradient(circle at 48% 44%,
-            white          0%,
-            ${color}       14%,
-            ${oa(color, 0.22)} 32%,
-            ${oa(color, 0   )} 52%)`,
-          filter: `blur(${Math.round(size * 0.12)}px)`,
-          pointerEvents: "none",
-        }}
-      />
+      {/* ── Outer atmospheric haze — large radius, heavy blur, no disc edge ── */}
+      <div aria-hidden style={{
+        position: "absolute",
+        inset: -Math.round(size * 0.78),
+        background: `radial-gradient(circle at 50% 50%,
+          ${oa(color, 0.62)} 0%,
+          ${oa(color, 0.30)} 20%,
+          ${oa(color, 0.09)} 38%,
+          ${oa(color, 0   )} 55%)`,
+        filter: `blur(${Math.round(size * 0.70)}px)`,
+        pointerEvents: "none",
+      }} />
+
+      {/* ── Inner warm bloom — tighter, less blurred ── */}
+      <div aria-hidden style={{
+        position: "absolute",
+        inset: -Math.round(size * 0.16),
+        background: `radial-gradient(circle at 47% 43%,
+          white              0%,
+          ${color}           13%,
+          ${oa(color, 0.20)} 30%,
+          ${oa(color, 0   )} 50%)`,
+        filter: `blur(${Math.round(size * 0.10)}px)`,
+        pointerEvents: "none",
+      }} />
 
       {/* ── SVG star character ── */}
       <svg
-        width={size}
-        height={size}
+        width={size} height={size}
         viewBox="0 0 100 100"
         style={{ position: "relative", zIndex: 1, overflow: "visible" }}
         aria-hidden
       >
-        {/* Five-point star body — R=45, r=19, center=(50,50), pointing up.
-            strokeLinejoin="round" softens the tips slightly, like the bunnies'
-            rounded-pixel outlines. */}
+        <defs>
+          {/* Clip path — all shading overlays are confined to the star silhouette */}
+          <clipPath id="csc-clip">
+            <polygon points="50,7 64.1,30.6 90.9,36.7 72.8,57.4 75.3,84.8 50,74 24.7,84.8 27.2,57.4 9.1,36.7 35.9,30.6" />
+          </clipPath>
+          {/* Warm upper-left highlight gradient */}
+          <radialGradient id="csc-hl" cx="42%" cy="35%" r="58%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="white" stopOpacity="0.50" />
+            <stop offset="40%"  stopColor="white" stopOpacity="0.10" />
+            <stop offset="100%" stopColor="white" stopOpacity="0"    />
+          </radialGradient>
+        </defs>
+
+        {/* ── Star body — chubby fat star: R=43, r=24, center=(50,50) ── */}
+        {/*   Thick round-joined outline (4px) matches bunny sprite borders.   */}
         <polygon
-          points="50,5 61.2,34.6 92.8,36.1 68.1,55.9 76.5,86.4 50,69 23.5,86.4 31.9,55.9 7.2,36.1 38.8,34.6"
+          points="50,7 64.1,30.6 90.9,36.7 72.8,57.4 75.3,84.8 50,74 24.7,84.8 27.2,57.4 9.1,36.7 35.9,30.6"
           fill={color}
           stroke="#2a1808"
-          strokeWidth="3"
+          strokeWidth="4"
           strokeLinejoin="round"
+          strokeLinecap="round"
+          paintOrder="stroke"
         />
 
-        {/* Shine — soft ellipse in the upper-left of the body, same as the
-            white sheen on the pixel bunnies */}
-        <ellipse
-          cx="37" cy="25" rx="8" ry="5"
-          fill="white" opacity="0.28"
-          transform="rotate(-30 37 25)"
+        {/* ── Shading: warm top highlight (clipped to star) ── */}
+        <polygon
+          points="50,7 64.1,30.6 90.9,36.7 72.8,57.4 75.3,84.8 50,74 24.7,84.8 27.2,57.4 9.1,36.7 35.9,30.6"
+          fill="url(#csc-hl)"
+          stroke="none"
         />
+
+        {/* ── Shading: subtle bottom shadow (clipped) ── */}
+        <rect x="0" y="58" width="100" height="46" fill="#1a0c04" opacity="0.13" clipPath="url(#csc-clip)" />
+
+        {/* ── Pixel-art highlight chunks in the upper-left — same sheen as bunnies ── */}
+        <g clipPath="url(#csc-clip)">
+          <rect x="31" y="17" width="5"   height="5"   rx="1"   fill="white" opacity="0.55" />
+          <rect x="36" y="12" width="3.5" height="3.5" rx="0.5" fill="white" opacity="0.38" />
+          <rect x="26" y="23" width="3"   height="3"   rx="0.5" fill="white" opacity="0.25" />
+        </g>
 
         {/* ── Face ── */}
+
         {sleeping ? (
-          // Sleeping eyes: two short pixel dashes, like the classic "—" closed eye
-          <g opacity="0.82">
-            <line x1="43" y1="49" x2="47" y2="49"
-              stroke="#2a1808" strokeWidth="2.2" strokeLinecap="round" />
-            <line x1="53" y1="49" x2="57" y2="49"
-              stroke="#2a1808" strokeWidth="2.2" strokeLinecap="round" />
+
+          /* Sleeping eyes: flat dashes — the classic pixel-art "— —" closed look */
+          <g opacity="0.88">
+            <line x1="36" y1="50" x2="46" y2="50" stroke="#2a1808" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="54" y1="50" x2="64" y2="50" stroke="#2a1808" strokeWidth="2.5" strokeLinecap="round" />
           </g>
+
         ) : (
+
           <g>
-            {/* Eyes — small filled rectangles (pixel-art style), slightly
-                spring-animated when first opening during the wake phase */}
-            <rect x="43" y="44" width="4.5" height="5" rx="1"
-              fill="#2a1808"
-              style={waking ? eyeAnim("0s") : undefined}
-            />
-            <rect x="53" y="44" width="4.5" height="5" rx="1"
-              fill="#2a1808"
-              style={waking ? eyeAnim("0.04s") : undefined}
-            />
-            {/* Tiny white glints — top-left corner of each eye */}
-            <rect x="44"   y="45" width="1.5" height="1.5" fill="white" opacity="0.95" />
-            <rect x="54"   y="45" width="1.5" height="1.5" fill="white" opacity="0.95" />
+            {/* LEFT eye — springs open on wake */}
+            <g style={waking ? { ...pivot, animation: "gift-eye-open 0.40s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}>
+              {/* Sclera */}
+              <rect x="35" y="40" width="12" height="15" rx="5" fill="white" stroke="#2a1808" strokeWidth="1.6" />
+              {/* Pupil */}
+              <rect x="37.5" y="42.5" width="8" height="10.5" rx="3" fill="#2a1808" />
+              {/* Main glint — large bright square */}
+              <rect x="41.5" y="43.5" width="3.5" height="3.5" rx="0.5" fill="white" opacity="1" />
+              {/* Soft secondary glint */}
+              <rect x="38"   y="50"   width="2"   height="2"   fill="white" opacity="0.45" />
+            </g>
 
-            {/* Smile — small curved path, intentionally subtle */}
+            {/* RIGHT eye — springs open then gives a cute wink mid-wake */}
+            <g style={waking ? { ...pivot, animation: "gift-wink 1.1s ease-in-out both" } : undefined}>
+              {/* Sclera */}
+              <rect x="53" y="40" width="12" height="15" rx="5" fill="white" stroke="#2a1808" strokeWidth="1.6" />
+              {/* Pupil */}
+              <rect x="55.5" y="42.5" width="8" height="10.5" rx="3" fill="#2a1808" />
+              {/* Main glint */}
+              <rect x="59.5" y="43.5" width="3.5" height="3.5" rx="0.5" fill="white" opacity="1" />
+              {/* Soft secondary glint */}
+              <rect x="56"   y="50"   width="2"   height="2"   fill="white" opacity="0.45" />
+            </g>
+
+            {/* Wide cute smile */}
             <path
-              d="M 45,57 Q 50,61 55,57"
+              d="M 40,64 Q 50,71 60,64"
               fill="none" stroke="#2a1808"
-              strokeWidth="2" strokeLinecap="round"
+              strokeWidth="2.4" strokeLinecap="round"
             />
 
-            {/* Blush cheeks — soft pink ovals, low opacity */}
-            <ellipse cx="39" cy="54" rx="5" ry="3" fill="#ffaaaa" opacity="0.38" />
-            <ellipse cx="61" cy="54" rx="5" ry="3" fill="#ffaaaa" opacity="0.38" />
+            {/* Generous pink cheek blush */}
+            <ellipse cx="35" cy="61" rx="7"   ry="4"   fill="#ff9aaa" opacity="0.45" />
+            <ellipse cx="65" cy="61" rx="7"   ry="4"   fill="#ff9aaa" opacity="0.45" />
           </g>
+
         )}
       </svg>
     </div>
@@ -438,6 +469,179 @@ function GiftIntroOverlay({
   );
 }
 
+// ─── GiftPostcard — collectible cozy postcard reveal ─────────────────────────
+//
+// Pastel pink card with stamp, bunny icon, and elegant typography.
+// Replaces the plain glass-card layout after the intro animation ends.
+
+function GiftPostcard({
+  gift,
+  emotionMeta,
+}: {
+  gift: GiftStarPublic;
+  emotionMeta: { emoji: string; label: string };
+}) {
+  // Pastel pink palette — independent of the gift star colour so the card
+  // always reads as a precious keepsake rather than just a coloured panel.
+  const cardBg    = "oklch(0.975 0.020 350)";
+  const border    = "oklch(0.87  0.040 350)";
+  const textDark  = "oklch(0.28  0.08  342)";
+  const textMid   = "oklch(0.52  0.07  342)";
+  const textLight = "oklch(0.70  0.05  342)";
+  const gold      = "oklch(0.72  0.10   52)";
+
+  return (
+    <article
+      style={{
+        width: "100%",
+        background: cardBg,
+        border: `1.5px solid ${border}`,
+        borderRadius: 22,
+        boxShadow: [
+          "0 2px 0 oklch(1 0 0 / 0.65) inset",   // top inner highlight
+          `0 -1px 0 ${border} inset`,              // bottom inner edge
+          "0 10px 48px oklch(0.72 0.08 345 / 0.18)",
+          "0 2px 10px oklch(0.72 0.08 345 / 0.12)",
+        ].join(", "),
+        overflow: "hidden",
+        fontFamily: "inherit",
+      }}
+    >
+      {/* Thin decorative stripe at the very top — rose → warm gold → rose */}
+      <div style={{
+        height: 4,
+        background: `linear-gradient(90deg,
+          oklch(0.82 0.07 345),
+          oklch(0.82 0.09 42),
+          oklch(0.82 0.07 345))`,
+      }} />
+
+      {/* ── Header ── */}
+      <header style={{ padding: "18px 20px 14px", position: "relative" }}>
+
+        {/* Corner sparkle */}
+        <span aria-hidden style={{
+          position: "absolute", top: 13, left: 15,
+          fontSize: 10, color: textLight, opacity: 0.7,
+          lineHeight: 1,
+        }}>✦</span>
+
+        {/* Postage stamp — top-right corner */}
+        <div aria-hidden style={{
+          position: "absolute", top: 14, right: 16,
+          width: 48, height: 56,
+          border: `1.5px dashed ${gold}`,
+          borderRadius: 4,
+          background: "oklch(1 0 0 / 0.55)",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          gap: 0,
+          padding: "5px 4px 4px",
+        }}>
+          <span style={{ fontSize: 20, lineHeight: 1 }}>⭐</span>
+          <div style={{
+            width: 32, height: 1,
+            background: `oklch(0.65 0.08 52 / 0.5)`,
+            margin: "4px 0 3px",
+          }} />
+          <span style={{
+            fontSize: 5.5, color: gold,
+            letterSpacing: 1.4,
+            textTransform: "uppercase",
+            lineHeight: 1,
+          }}>GALAXY</span>
+        </div>
+
+        {/* Emotion badge */}
+        <p style={{
+          fontSize: 9, fontWeight: 700,
+          letterSpacing: 2.2,
+          textTransform: "uppercase",
+          color: textLight,
+          margin: "0 0 6px",
+        }}>
+          {emotionMeta.emoji}&ensp;{emotionMeta.label}
+        </p>
+
+        {/* Recipient name — large elegant heading */}
+        <h2 style={{
+          fontFamily: "var(--font-elegant, 'Georgia', serif)",
+          fontSize: 25, fontWeight: 400,
+          color: textDark, lineHeight: 1.25,
+          paddingRight: 64, margin: "0 0 6px",
+        }}>
+          For {gift.to_name} ✨
+        </h2>
+
+        {/* Sender line */}
+        <p style={{ fontSize: 12, color: textMid, margin: 0 }}>
+          From&nbsp;<strong style={{ color: textDark }}>{gift.sender_name}</strong>
+        </p>
+      </header>
+
+      {/* ── Decorative divider ── */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8,
+        padding: "0 20px", marginBottom: 14,
+      }}>
+        <div style={{ flex: 1, height: 1, background: border }} />
+        <span aria-hidden style={{ color: textLight, fontSize: 11, lineHeight: 1 }}>✦</span>
+        <div style={{ flex: 1, height: 1, background: border }} />
+      </div>
+
+      {/* ── Message ── */}
+      <div style={{ padding: "0 24px 20px" }}>
+        <p style={{
+          fontFamily: "var(--font-elegant, 'Georgia', serif)",
+          fontStyle: "italic",
+          fontSize: 14, lineHeight: 1.80,
+          color: textMid,
+          whiteSpace: "pre-wrap",
+          margin: 0,
+        }}>
+          &ldquo;{gift.message}&rdquo;
+        </p>
+      </div>
+
+      {/* ── Lower rule ── */}
+      <div style={{ height: 1, background: border, margin: "0 20px" }} />
+
+      {/* ── Footer ── */}
+      <footer style={{
+        display: "flex", alignItems: "center",
+        justifyContent: "space-between",
+        padding: "11px 16px 13px",
+      }}>
+        {/* Bunny character — bottom-left corner */}
+        <img
+          src={bunnyHer}
+          alt=""
+          width={38} height={38}
+          style={{ imageRendering: "pixelated", objectFit: "contain", opacity: 0.88 }}
+        />
+
+        {/* Footer text + link — right-aligned */}
+        <div style={{ textAlign: "right" }}>
+          <p style={{ fontSize: 9.5, color: textLight, margin: "0 0 2px" }}>
+            Sent with love via
+          </p>
+          <Link
+            to="/"
+            style={{
+              fontSize: 11, color: textMid,
+              fontWeight: 600, textDecoration: "none",
+              display: "flex", alignItems: "center",
+              gap: 4, justifyContent: "flex-end",
+            }}
+          >
+            Our Little Galaxy&ensp;✦
+          </Link>
+        </div>
+      </footer>
+    </article>
+  );
+}
+
 // ─── Open-gift view (owns the intro state machine) ────────────────────────────
 
 function GiftOpenView({ gift, activeColor }: { gift: GiftStarPublic; activeColor: string }) {
@@ -465,58 +669,18 @@ function GiftOpenView({ gift, activeColor }: { gift: GiftStarPublic; activeColor
         <GiftIntroOverlay phase={phase} color={activeColor} />
       )}
 
-      {/* Gift content — invisible while the animation plays, then fades in */}
+      {/* Gift postcard — hidden during the animation, fades in on reveal */}
       <div
-        className="flex w-full flex-col items-center gap-8"
+        className="w-full"
         style={{
-          opacity:      phase === "revealed" ? 1 : 0,
-          animation:    phase === "revealed"
+          opacity:       phase === "revealed" ? 1 : 0,
+          animation:     phase === "revealed"
             ? "gift-content-reveal 0.9s cubic-bezier(0.22,1,0.36,1) both"
             : "none",
           pointerEvents: phase === "revealed" ? "auto" : "none",
         }}
       >
-        <StarOrb color={activeColor} size={140} />
-
-        {/* Heading */}
-        <div className="text-center">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-foreground/40">
-            {emotionMeta.emoji} {emotionMeta.label}
-          </p>
-          <h1 className="font-elegant text-3xl text-foreground/90">
-            For {gift.to_name} ✨
-          </h1>
-          <p className="mt-1.5 text-sm text-foreground/55">
-            From <span className="font-semibold text-foreground/80">{gift.sender_name}</span>
-          </p>
-        </div>
-
-        {/* Message card */}
-        <div
-          className="w-full rounded-2xl p-6"
-          style={{ background: "oklch(1 0 0 / 0.06)", border: "1px solid oklch(1 0 0 / 0.12)" }}
-        >
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-foreground/40">
-            Message
-          </p>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/85">
-            {gift.message}
-          </p>
-        </div>
-
-        {/* Footer */}
-        <div className="flex flex-col items-center gap-3">
-          <p className="text-xs text-foreground/30">
-            Sent with love via Our Little Galaxy
-          </p>
-          <Link
-            to="/"
-            className="flex items-center gap-1.5 text-xs text-foreground/40 hover:text-foreground/65 transition-colors"
-          >
-            <Gift size={12} />
-            Create your own Galaxy
-          </Link>
-        </div>
+        <GiftPostcard gift={gift} emotionMeta={emotionMeta} />
       </div>
     </Shell>
   );
