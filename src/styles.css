@@ -589,6 +589,27 @@ html, body {
   100% { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
+/* 8. Pixel teaser card pops in after burst */
+@keyframes gift-card-reveal {
+  0%   { opacity: 0; transform: scale(0.82) translateY(18px); }
+  55%  { opacity: 1; transform: scale(1.04) translateY(-4px); }
+  80%  { transform: scale(0.99) translateY(1px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 9. Pixel teaser card slides out before message reveals */
+@keyframes gift-card-exit {
+  0%   { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.90) translateY(-24px); }
+}
+
+/* 10. Star sparkle lines burst outward during wake */
+@keyframes gift-sparkle-line {
+  0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.5) rotate(15deg); }
+}
+
 :root[data-theme="vanilla"] {
   --primary:          oklch(0.88 0.10 72);
   --accent:           oklch(0.80 0.10 48);

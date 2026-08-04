@@ -60,7 +60,7 @@ const TWINKLE_DOTS = [
 
 // ─── Intro animation constants ────────────────────────────────────────────────
 
-type OpenPhase = "intro" | "wake" | "arc" | "burst" | "revealed";
+type OpenPhase = "intro" | "wake" | "arc" | "burst" | "card" | "revealed";
 
 // 12-point starburst burst particles. bx/by are CSS pixel strings for --bx/--by vars.
 const BURST_PARTICLES = Array.from({ length: 12 }, (_, i) => {
@@ -193,14 +193,17 @@ function Shell({ color, children }: { color: string; children: React.ReactNode }
   );
 }
 
-// ─── CuteStarCharacter — chubby cozy pixel-art star (Animal Crossing × Stardew) ──
+// ─── CuteStarCharacter — kawaii pixel-art star guide ──────────────────────────
 //
-// Chubby five-point star (R=43, r=24 — inner radius 56% of outer vs. the standard
-// 38%, giving it puffier tips). Big sclera eyes with dark pupils and white glints,
-// sleeping dash-eyes, spring-open on wake, wink on the right eye mid-wake, wide
-// smile, generous pink cheeks. Layered SVG shading (highlight + shadow + pixel
-// sparkle chunks) matches the bunny sprite style. Glow uses the same edgeless-blur
-// approach as StarOrb so the character floats cleanly on the night-sky background.
+// Chubby five-point star with pixel-art shading (R=42, r=26 — chunky inner arms).
+// Face: big round sclera eyes with dark pupils, cross-shaped star glints, sleeping
+// dash-eyes, spring-open on wake, wink on right eye mid-wake, tiny curved smile,
+// generous pink blush circles. Layered SVG shading (gradient highlight + shadow
+// rect + prominent pixel highlight blocks) gives the chunky pixel-art look.
+// Glow uses edgeless blurred gradients to float cleanly on the night-sky bg.
+
+// Precomputed polygon for R=42, r=26 (chunkier inner arms than before)
+const STAR_POINTS = "50,8 65.3,28.9 89.9,37.0 74.7,58.0 74.7,83.9 50,76 25.3,83.9 25.3,58.0 10.1,37.0 34.7,28.9";
 
 function CuteStarCharacter({
   color,
@@ -209,7 +212,7 @@ function CuteStarCharacter({
 }: {
   color: string;
   size?: number;
-  phase: Exclude<OpenPhase, "revealed">;
+  phase: Exclude<OpenPhase, "card" | "revealed">;
 }) {
   const sleeping = phase === "intro";
   const waking   = phase === "wake";
@@ -228,125 +231,169 @@ function CuteStarCharacter({
       {/* ── Outer atmospheric haze — large radius, heavy blur, no disc edge ── */}
       <div aria-hidden style={{
         position: "absolute",
-        inset: -Math.round(size * 0.78),
+        inset: -Math.round(size * 0.85),
         background: `radial-gradient(circle at 50% 50%,
-          ${oa(color, 0.62)} 0%,
-          ${oa(color, 0.30)} 20%,
-          ${oa(color, 0.09)} 38%,
+          ${oa(color, 0.70)} 0%,
+          ${oa(color, 0.35)} 20%,
+          ${oa(color, 0.10)} 38%,
           ${oa(color, 0   )} 55%)`,
-        filter: `blur(${Math.round(size * 0.70)}px)`,
+        filter: `blur(${Math.round(size * 0.78)}px)`,
         pointerEvents: "none",
       }} />
 
       {/* ── Inner warm bloom — tighter, less blurred ── */}
       <div aria-hidden style={{
         position: "absolute",
-        inset: -Math.round(size * 0.16),
+        inset: -Math.round(size * 0.18),
         background: `radial-gradient(circle at 47% 43%,
           white              0%,
-          ${color}           13%,
-          ${oa(color, 0.20)} 30%,
-          ${oa(color, 0   )} 50%)`,
-        filter: `blur(${Math.round(size * 0.10)}px)`,
+          ${color}           14%,
+          ${oa(color, 0.25)} 32%,
+          ${oa(color, 0   )} 52%)`,
+        filter: `blur(${Math.round(size * 0.12)}px)`,
         pointerEvents: "none",
       }} />
+
+      {/* ── Sparkle lines during wake — four diagonal dashes radiating outward ── */}
+      {waking && (
+        <svg
+          aria-hidden
+          width={size * 2.4} height={size * 2.4}
+          viewBox="-60 -60 220 220"
+          style={{
+            position: "absolute",
+            top: "50%", left: "50%",
+            transform: "translate(-50%,-50%)",
+            overflow: "visible",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        >
+          {[[-1,-1],[1,-1],[1,1],[-1,1],[-1,0],[1,0],[0,-1],[0,1]].map(([dx,dy], i) => (
+            <line
+              key={i}
+              x1={50 + dx * 68} y1={50 + dy * 68}
+              x2={50 + dx * 82} y2={50 + dy * 82}
+              stroke="white" strokeWidth="2.5" strokeLinecap="round"
+              opacity="0.80"
+              style={{
+                animation: `gift-sparkle-line 0.7s ease-out ${i * 0.04}s both`,
+              }}
+            />
+          ))}
+        </svg>
+      )}
 
       {/* ── SVG star character ── */}
       <svg
         width={size} height={size}
         viewBox="0 0 100 100"
+        shapeRendering="crispEdges"
         style={{ position: "relative", zIndex: 1, overflow: "visible" }}
         aria-hidden
       >
         <defs>
-          {/* Clip path — all shading overlays are confined to the star silhouette */}
+          {/* Clip to star silhouette for all shading overlays */}
           <clipPath id="csc-clip">
-            <polygon points="50,7 64.1,30.6 90.9,36.7 72.8,57.4 75.3,84.8 50,74 24.7,84.8 27.2,57.4 9.1,36.7 35.9,30.6" />
+            <polygon points={STAR_POINTS} />
           </clipPath>
           {/* Warm upper-left highlight gradient */}
-          <radialGradient id="csc-hl" cx="42%" cy="35%" r="58%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="white" stopOpacity="0.50" />
-            <stop offset="40%"  stopColor="white" stopOpacity="0.10" />
+          <radialGradient id="csc-hl" cx="40%" cy="32%" r="55%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="white" stopOpacity="0.62" />
+            <stop offset="35%"  stopColor="white" stopOpacity="0.18" />
             <stop offset="100%" stopColor="white" stopOpacity="0"    />
           </radialGradient>
+          {/* Subtle bottom-shadow gradient */}
+          <linearGradient id="csc-sh" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="50%" stopColor="#1a0c04" stopOpacity="0"    />
+            <stop offset="100%" stopColor="#1a0c04" stopOpacity="0.22" />
+          </linearGradient>
         </defs>
 
-        {/* ── Star body — chubby fat star: R=43, r=24, center=(50,50) ── */}
-        {/*   Thick round-joined outline (4px) matches bunny sprite borders.   */}
+        {/* ── Star body — chunkier inner arms (r=26) for pixel-art puffiness ── */}
         <polygon
-          points="50,7 64.1,30.6 90.9,36.7 72.8,57.4 75.3,84.8 50,74 24.7,84.8 27.2,57.4 9.1,36.7 35.9,30.6"
+          points={STAR_POINTS}
           fill={color}
-          stroke="#2a1808"
-          strokeWidth="4"
-          strokeLinejoin="round"
-          strokeLinecap="round"
+          stroke="#2d1400"
+          strokeWidth="4.5"
+          strokeLinejoin="miter"
+          strokeLinecap="square"
           paintOrder="stroke"
         />
 
-        {/* ── Shading: warm top highlight (clipped to star) ── */}
-        <polygon
-          points="50,7 64.1,30.6 90.9,36.7 72.8,57.4 75.3,84.8 50,74 24.7,84.8 27.2,57.4 9.1,36.7 35.9,30.6"
-          fill="url(#csc-hl)"
-          stroke="none"
-        />
+        {/* ── Pixel-art shading row — darker amber bottom strip (clipped) ── */}
+        <rect x="0" y="55" width="100" height="50" fill="url(#csc-sh)" clipPath="url(#csc-clip)" />
 
-        {/* ── Shading: subtle bottom shadow (clipped) ── */}
-        <rect x="0" y="58" width="100" height="46" fill="#1a0c04" opacity="0.13" clipPath="url(#csc-clip)" />
+        {/* ── Warm upper-left highlight gradient (clipped) ── */}
+        <polygon points={STAR_POINTS} fill="url(#csc-hl)" stroke="none" />
 
-        {/* ── Pixel-art highlight chunks in the upper-left — same sheen as bunnies ── */}
+        {/* ── Pixel-art highlight blocks — prominent white squares, top-left zone ── */}
         <g clipPath="url(#csc-clip)">
-          <rect x="31" y="17" width="5"   height="5"   rx="1"   fill="white" opacity="0.55" />
-          <rect x="36" y="12" width="3.5" height="3.5" rx="0.5" fill="white" opacity="0.38" />
-          <rect x="26" y="23" width="3"   height="3"   rx="0.5" fill="white" opacity="0.25" />
+          {/* Large main highlight block */}
+          <rect x="29" y="15" width="7"   height="7"   fill="white" opacity="0.70" />
+          {/* Medium highlight */}
+          <rect x="36" y="10" width="5"   height="5"   fill="white" opacity="0.50" />
+          {/* Small accent */}
+          <rect x="24" y="22" width="4"   height="4"   fill="white" opacity="0.35" />
+          {/* Tiny sparkle */}
+          <rect x="39" y="16" width="3"   height="3"   fill="white" opacity="0.25" />
+          {/* Right arm mid-shine */}
+          <rect x="72" y="38" width="4"   height="3"   fill="white" opacity="0.20" />
         </g>
 
         {/* ── Face ── */}
 
         {sleeping ? (
 
-          /* Sleeping eyes: flat dashes — the classic pixel-art "— —" closed look */
-          <g opacity="0.88">
-            <line x1="36" y1="50" x2="46" y2="50" stroke="#2a1808" strokeWidth="2.5" strokeLinecap="round" />
-            <line x1="54" y1="50" x2="64" y2="50" stroke="#2a1808" strokeWidth="2.5" strokeLinecap="round" />
+          /* Sleeping: wide soft dash-eyes, tiny mouth curve — "— —" */
+          <g opacity="0.90">
+            <rect x="33" y="48" width="13" height="3.5" rx="1.75" fill="#2d1400" />
+            <rect x="54" y="48" width="13" height="3.5" rx="1.75" fill="#2d1400" />
+            {/* Tiny sleeping blush circles */}
+            <ellipse cx="34" cy="58" rx="5.5" ry="3.5" fill="#ff9aaa" opacity="0.40" />
+            <ellipse cx="66" cy="58" rx="5.5" ry="3.5" fill="#ff9aaa" opacity="0.40" />
           </g>
 
         ) : (
 
           <g>
-            {/* LEFT eye — springs open on wake */}
+            {/* LEFT eye — big round sclera, springs open on wake */}
             <g style={waking ? { ...pivot, animation: "gift-eye-open 0.40s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}>
-              {/* Sclera */}
-              <rect x="35" y="40" width="12" height="15" rx="5" fill="white" stroke="#2a1808" strokeWidth="1.6" />
+              {/* Sclera — taller oval */}
+              <rect x="33" y="38" width="14" height="17" rx="7" fill="white" stroke="#2d1400" strokeWidth="1.8" />
               {/* Pupil */}
-              <rect x="37.5" y="42.5" width="8" height="10.5" rx="3" fill="#2a1808" />
-              {/* Main glint — large bright square */}
-              <rect x="41.5" y="43.5" width="3.5" height="3.5" rx="0.5" fill="white" opacity="1" />
-              {/* Soft secondary glint */}
-              <rect x="38"   y="50"   width="2"   height="2"   fill="white" opacity="0.45" />
+              <rect x="35.5" y="40.5" width="9" height="12" rx="3.5" fill="#2d1400" />
+              {/* Star-shaped glint: cross of two white rects */}
+              <rect x="40"   y="41.5" width="4"   height="1.5" fill="white" opacity="1" />
+              <rect x="41"   y="40.5" width="2"   height="3.5" fill="white" opacity="1" />
+              {/* Soft secondary glint (bottom-left of pupil) */}
+              <rect x="36.5" y="49.5" width="2.5" height="2.5" fill="white" opacity="0.50" />
             </g>
 
-            {/* RIGHT eye — springs open then gives a cute wink mid-wake */}
+            {/* RIGHT eye — springs open then gives a cute wink */}
             <g style={waking ? { ...pivot, animation: "gift-wink 1.1s ease-in-out both" } : undefined}>
               {/* Sclera */}
-              <rect x="53" y="40" width="12" height="15" rx="5" fill="white" stroke="#2a1808" strokeWidth="1.6" />
+              <rect x="53" y="38" width="14" height="17" rx="7" fill="white" stroke="#2d1400" strokeWidth="1.8" />
               {/* Pupil */}
-              <rect x="55.5" y="42.5" width="8" height="10.5" rx="3" fill="#2a1808" />
-              {/* Main glint */}
-              <rect x="59.5" y="43.5" width="3.5" height="3.5" rx="0.5" fill="white" opacity="1" />
+              <rect x="55.5" y="40.5" width="9" height="12" rx="3.5" fill="#2d1400" />
+              {/* Star-shaped glint */}
+              <rect x="60"   y="41.5" width="4"   height="1.5" fill="white" opacity="1" />
+              <rect x="61"   y="40.5" width="2"   height="3.5" fill="white" opacity="1" />
               {/* Soft secondary glint */}
-              <rect x="56"   y="50"   width="2"   height="2"   fill="white" opacity="0.45" />
+              <rect x="56.5" y="49.5" width="2.5" height="2.5" fill="white" opacity="0.50" />
             </g>
 
-            {/* Wide cute smile */}
+            {/* Tiny curved smile */}
             <path
-              d="M 40,64 Q 50,71 60,64"
-              fill="none" stroke="#2a1808"
-              strokeWidth="2.4" strokeLinecap="round"
+              d="M 41,63 Q 50,69 59,63"
+              fill="none" stroke="#2d1400"
+              strokeWidth="2.6" strokeLinecap="round"
+              shapeRendering="geometricPrecision"
             />
 
-            {/* Generous pink cheek blush */}
-            <ellipse cx="35" cy="61" rx="7"   ry="4"   fill="#ff9aaa" opacity="0.45" />
-            <ellipse cx="65" cy="61" rx="7"   ry="4"   fill="#ff9aaa" opacity="0.45" />
+            {/* Soft round pink cheeks */}
+            <ellipse cx="33" cy="60" rx="6.5" ry="4.5" fill="#ff88aa" opacity="0.50" />
+            <ellipse cx="67" cy="60" rx="6.5" ry="4.5" fill="#ff88aa" opacity="0.50" />
           </g>
 
         )}
@@ -367,7 +414,7 @@ function GiftIntroOverlay({
   phase,
   color,
 }: {
-  phase: Exclude<OpenPhase, "revealed">;
+  phase: Exclude<OpenPhase, "card" | "revealed">;
   color: string;
 }) {
   const starAnimation =
@@ -465,6 +512,130 @@ function GiftIntroOverlay({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── PixelTeaserCard — "You have a gift!" interstitial ───────────────────────
+//
+// Cute pixel-style parchment card that appears after the burst and before the
+// full postcard reveals. Mimics the reference: decorative stitched border,
+// heart stamp top-right, bunny bottom-left, bold centred text.
+
+function PixelTeaserCard({
+  toName,
+  exiting,
+}: {
+  toName: string;
+  exiting: boolean;
+}) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 340,
+        animation: exiting
+          ? "gift-card-exit 0.5s cubic-bezier(0.4,0,0.6,1) forwards"
+          : "gift-card-reveal 0.65s cubic-bezier(0.34,1.56,0.64,1) both",
+      }}
+    >
+      <article
+        style={{
+          background: "oklch(0.978 0.018 50)",   // warm parchment
+          border: "3px solid oklch(0.82 0.06 50)",
+          borderRadius: 20,
+          position: "relative",
+          overflow: "hidden",
+          boxShadow: [
+            "0 0 0 6px oklch(0.94 0.04 50)",      // outer parchment ring
+            "0 0 0 7px oklch(0.78 0.07 50)",       // pixel border ring
+            "0 12px 48px oklch(0.60 0.10 50 / 0.30)",
+          ].join(", "),
+          fontFamily: "inherit",
+          padding: "28px 24px 22px",
+          textAlign: "center",
+        }}
+      >
+        {/* Stitched corner dots — pixel-art detail */}
+        {["top-left","top-right","bottom-left","bottom-right"].map((c) => (
+          <span
+            key={c}
+            aria-hidden
+            style={{
+              position: "absolute",
+              ...(c.includes("top")    ? { top: 8 }    : { bottom: 8 }),
+              ...(c.includes("left")  ? { left: 8 }   : { right: 8 }),
+              width: 5, height: 5,
+              borderRadius: 1,
+              background: "oklch(0.72 0.08 50)",
+            }}
+          />
+        ))}
+
+        {/* Decorative border dashes — top and bottom rows */}
+        <div aria-hidden style={{
+          position: "absolute", top: 14, left: 20, right: 20,
+          height: 1,
+          background: "repeating-linear-gradient(90deg, oklch(0.75 0.07 50) 0px, oklch(0.75 0.07 50) 4px, transparent 4px, transparent 9px)",
+        }} />
+        <div aria-hidden style={{
+          position: "absolute", bottom: 14, left: 20, right: 20,
+          height: 1,
+          background: "repeating-linear-gradient(90deg, oklch(0.75 0.07 50) 0px, oklch(0.75 0.07 50) 4px, transparent 4px, transparent 9px)",
+        }} />
+
+        {/* Heart stamp — top right */}
+        <div aria-hidden style={{
+          position: "absolute", top: 18, right: 18,
+          width: 44, height: 50,
+          border: "2px dashed oklch(0.72 0.08 50)",
+          borderRadius: 4,
+          background: "oklch(1 0 0 / 0.50)",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          gap: 2,
+          padding: "4px 3px 3px",
+        }}>
+          <span style={{ fontSize: 19, lineHeight: 1 }}>❤️</span>
+          <div style={{
+            width: 28, height: 1,
+            background: "oklch(0.65 0.08 50 / 0.5)",
+            marginTop: 3,
+          }} />
+        </div>
+
+        {/* Main text */}
+        <div style={{ marginTop: 12, marginBottom: 16 }}>
+          <p style={{
+            fontSize: 28, fontWeight: 800,
+            lineHeight: 1.25,
+            color: "oklch(0.28 0.08 342)",
+            letterSpacing: "-0.01em",
+            margin: "0 0 4px",
+          }}>
+            You have<br />a gift! ❤
+          </p>
+          {toName && (
+            <p style={{
+              fontSize: 13,
+              color: "oklch(0.55 0.07 342)",
+              margin: 0,
+            }}>
+              For&nbsp;<strong style={{ color: "oklch(0.35 0.09 342)" }}>{toName}</strong>
+            </p>
+          )}
+        </div>
+
+        {/* Bunny — bottom left */}
+        <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 4 }}>
+          <img
+            src={bunnyHer}
+            alt=""
+            width={34} height={34}
+            style={{ imageRendering: "pixelated", objectFit: "contain", opacity: 0.85 }}
+          />
+        </div>
+      </article>
     </div>
   );
 }
@@ -647,26 +818,37 @@ function GiftPostcard({
 function GiftOpenView({ gift, activeColor }: { gift: GiftStarPublic; activeColor: string }) {
   const emotionMeta = EMOTIONS.find((e) => e.key === gift.emotion) ?? EMOTIONS[0];
   const [phase, setPhase] = useState<OpenPhase>("intro");
+  // cardExiting drives the exit animation of PixelTeaserCard before "revealed"
+  const [cardExiting, setCardExiting] = useState(false);
 
   useEffect(() => {
     // Phase timeline:
-    //   0 ms  → "intro"  (star appears, spring scale-up)
-    // 700 ms  → "wake"   (star surges brighter)
-    // 1800 ms → "arc"    (star sweeps arc downward, trail dots form)
-    // 3200 ms → "burst"  (flash + particles at arc endpoint)
-    // 3550 ms → "revealed" (overlay gone, content fades in)
-    const t1 = setTimeout(() => setPhase("wake"),      700);
-    const t2 = setTimeout(() => setPhase("arc"),      1800);
-    const t3 = setTimeout(() => setPhase("burst"),    3200);
-    const t4 = setTimeout(() => setPhase("revealed"), 3550);
-    return () => [t1, t2, t3, t4].forEach(clearTimeout);
+    //    0 ms → "intro"    star appears (spring scale-up)
+    //  700 ms → "wake"     star wakes & winks
+    // 1800 ms → "arc"      star flies arc downward with sparkle trail
+    // 3200 ms → "burst"    flash + particles at arc endpoint
+    // 3550 ms → "card"     pixel teaser card: "You have a gift! ❤"
+    // 5000 ms →            teaser card exits (slide-out)
+    // 5500 ms → "revealed" actual gift postcard fades in
+    const t1 = setTimeout(() => setPhase("wake"),         700);
+    const t2 = setTimeout(() => setPhase("arc"),         1800);
+    const t3 = setTimeout(() => setPhase("burst"),       3200);
+    const t4 = setTimeout(() => setPhase("card"),        3550);
+    const t5 = setTimeout(() => setCardExiting(true),    5000);
+    const t6 = setTimeout(() => setPhase("revealed"),    5500);
+    return () => [t1, t2, t3, t4, t5, t6].forEach(clearTimeout);
   }, []);
 
   return (
     <Shell color={activeColor}>
       {/* Intro overlay — fixed on top during the animation phases */}
-      {phase !== "revealed" && (
+      {phase !== "card" && phase !== "revealed" && (
         <GiftIntroOverlay phase={phase} color={activeColor} />
+      )}
+
+      {/* Pixel teaser card — "You have a gift!" shown between burst and postcard */}
+      {phase === "card" && (
+        <PixelTeaserCard toName={gift.to_name} exiting={cardExiting} />
       )}
 
       {/* Gift postcard — hidden during the animation, fades in on reveal */}
