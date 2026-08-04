@@ -193,21 +193,28 @@ function Shell({ color, children }: { color: string; children: React.ReactNode }
   );
 }
 
-// ─── CuteStarCharacter — kawaii pixel-art star guide ──────────────────────────
+// ─── CuteStarCharacter — genuine kawaii pixel-art star sprite ─────────────────
 //
-// Chubby five-point star with pixel-art shading (R=42, r=26 — chunky inner arms).
-// Face: big round sclera eyes with dark pupils, cross-shaped star glints, sleeping
-// dash-eyes, spring-open on wake, wink on right eye mid-wake, tiny curved smile,
-// generous pink blush circles. Layered SVG shading (gradient highlight + shadow
-// rect + prominent pixel highlight blocks) gives the chunky pixel-art look.
-// Glow uses edgeless blurred gradients to float cleanly on the night-sky bg.
+// Design principles matching the reference:
+//   • Fixed warm golden body (#FFD44A) — always golden regardless of gift colour
+//   • Compact polygon R=40,r=22 with integer coordinates for a blocky pixel feel
+//   • Thin dark-brown outline (2.2px) — not thick cartoon strokes
+//   • Pixel-art eyes: small dark rounded rects (~8×9) with a tiny 2×2 white glint,
+//     NO visible white sclera background (pixel-art sprites don't have white ovals)
+//   • Sleeping: two tiny dash rects; waking: left eye opens, right eye winks
+//   • Minimal soft glow (single layer, ~30% of old size) so character reads clearly
+//   • Solid pixel highlight blocks + subtle body gradient for volume
 
-// Precomputed polygon for R=42, r=26 (chunkier inner arms than before)
-const STAR_POINTS = "50,8 65.3,28.9 89.9,37.0 74.7,58.0 74.7,83.9 50,76 25.3,83.9 25.3,58.0 10.1,37.0 34.7,28.9";
+// Star body colours — always golden, independent of gift colour
+const PX_FILL    = "#FFD44A";   // warm golden body
+const PX_OUTLINE = "#3D1E00";   // dark warm-brown outline & face
+
+// R=40, r=22, centre (50,50), integer-snapped for a blocky pixel-art silhouette
+const STAR_POINTS = "50,8 63,30 88,36 71,55 74,80 50,70 26,80 29,55 12,36 37,30";
 
 function CuteStarCharacter({
   color,
-  size = 120,
+  size = 96,
   phase,
 }: {
   color: string;
@@ -217,7 +224,7 @@ function CuteStarCharacter({
   const sleeping = phase === "intro";
   const waking   = phase === "wake";
 
-  // Shared transform props for SVG element animations (scaleY needs fill-box).
+  // scaleY wink/open needs transform-origin at the element's own centre
   const pivot: React.CSSProperties = {
     transformBox:    "fill-box",
     transformOrigin: "center",
@@ -228,38 +235,25 @@ function CuteStarCharacter({
       className={sleeping || waking ? "animate-float-y" : undefined}
       style={{ position: "relative", width: size, height: size }}
     >
-      {/* ── Outer atmospheric haze — large radius, heavy blur, no disc edge ── */}
+      {/* ── Single soft ambient glow — much smaller than before ── */}
       <div aria-hidden style={{
-        position: "absolute",
-        inset: -Math.round(size * 0.85),
+        position:  "absolute",
+        inset:     -Math.round(size * 0.32),
         background: `radial-gradient(circle at 50% 50%,
-          ${oa(color, 0.70)} 0%,
-          ${oa(color, 0.35)} 20%,
-          ${oa(color, 0.10)} 38%,
-          ${oa(color, 0   )} 55%)`,
-        filter: `blur(${Math.round(size * 0.78)}px)`,
+          ${oa(color, 0.55)} 0%,
+          ${oa(color, 0.24)} 28%,
+          ${oa(color, 0.07)} 50%,
+          ${oa(color, 0   )} 66%)`,
+        filter:     `blur(${Math.round(size * 0.30)}px)`,
         pointerEvents: "none",
       }} />
 
-      {/* ── Inner warm bloom — tighter, less blurred ── */}
-      <div aria-hidden style={{
-        position: "absolute",
-        inset: -Math.round(size * 0.18),
-        background: `radial-gradient(circle at 47% 43%,
-          white              0%,
-          ${color}           14%,
-          ${oa(color, 0.25)} 32%,
-          ${oa(color, 0   )} 52%)`,
-        filter: `blur(${Math.round(size * 0.12)}px)`,
-        pointerEvents: "none",
-      }} />
-
-      {/* ── Sparkle lines during wake — four diagonal dashes radiating outward ── */}
+      {/* ── Sparkle burst lines on wake — short dashes radiating outward ── */}
       {waking && (
         <svg
           aria-hidden
-          width={size * 2.4} height={size * 2.4}
-          viewBox="-60 -60 220 220"
+          width={size * 2.2} height={size * 2.2}
+          viewBox="-55 -55 210 210"
           style={{
             position: "absolute",
             top: "50%", left: "50%",
@@ -269,22 +263,21 @@ function CuteStarCharacter({
             pointerEvents: "none",
           }}
         >
-          {[[-1,-1],[1,-1],[1,1],[-1,1],[-1,0],[1,0],[0,-1],[0,1]].map(([dx,dy], i) => (
+          {/* 8 directions: diagonals + cardinals */}
+          {([[-1,-1],[1,-1],[1,1],[-1,1],[0,-1],[1,0],[0,1],[-1,0]] as [number,number][]).map(([dx,dy], i) => (
             <line
               key={i}
-              x1={50 + dx * 68} y1={50 + dy * 68}
-              x2={50 + dx * 82} y2={50 + dy * 82}
-              stroke="white" strokeWidth="2.5" strokeLinecap="round"
-              opacity="0.80"
-              style={{
-                animation: `gift-sparkle-line 0.7s ease-out ${i * 0.04}s both`,
-              }}
+              x1={50 + dx * 62} y1={50 + dy * 62}
+              x2={50 + dx * 78} y2={50 + dy * 78}
+              stroke="white" strokeWidth="2.2" strokeLinecap="round"
+              opacity="0.82"
+              style={{ animation: `gift-sparkle-line 0.65s ease-out ${i * 0.04}s both` }}
             />
           ))}
         </svg>
       )}
 
-      {/* ── SVG star character ── */}
+      {/* ── Pixel-art star SVG ── */}
       <svg
         width={size} height={size}
         viewBox="0 0 100 100"
@@ -293,107 +286,85 @@ function CuteStarCharacter({
         aria-hidden
       >
         <defs>
-          {/* Clip to star silhouette for all shading overlays */}
+          {/* Clip everything to the star silhouette */}
           <clipPath id="csc-clip">
             <polygon points={STAR_POINTS} />
           </clipPath>
-          {/* Warm upper-left highlight gradient */}
-          <radialGradient id="csc-hl" cx="40%" cy="32%" r="55%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="white" stopOpacity="0.62" />
-            <stop offset="35%"  stopColor="white" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="white" stopOpacity="0"    />
+          {/* Subtle body gradient: brighter top-left, deeper golden bottom */}
+          <radialGradient id="csc-body" cx="38%" cy="34%" r="68%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="#FFE870" />
+            <stop offset="55%"  stopColor="#FFD44A" />
+            <stop offset="100%" stopColor="#F0A800" />
           </radialGradient>
-          {/* Subtle bottom-shadow gradient */}
-          <linearGradient id="csc-sh" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="50%" stopColor="#1a0c04" stopOpacity="0"    />
-            <stop offset="100%" stopColor="#1a0c04" stopOpacity="0.22" />
-          </linearGradient>
         </defs>
 
-        {/* ── Star body — chunkier inner arms (r=26) for pixel-art puffiness ── */}
+        {/* ── Star body ── */}
         <polygon
           points={STAR_POINTS}
-          fill={color}
-          stroke="#2d1400"
-          strokeWidth="4.5"
-          strokeLinejoin="miter"
-          strokeLinecap="square"
+          fill="url(#csc-body)"
+          stroke={PX_OUTLINE}
+          strokeWidth="2.2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
           paintOrder="stroke"
         />
 
-        {/* ── Pixel-art shading row — darker amber bottom strip (clipped) ── */}
-        <rect x="0" y="55" width="100" height="50" fill="url(#csc-sh)" clipPath="url(#csc-clip)" />
+        {/* ── Bottom shadow strip (pixel-art depth) ── */}
+        <rect x="0" y="56" width="100" height="44"
+          fill="#8B5200" opacity="0.18"
+          clipPath="url(#csc-clip)" />
 
-        {/* ── Warm upper-left highlight gradient (clipped) ── */}
-        <polygon points={STAR_POINTS} fill="url(#csc-hl)" stroke="none" />
-
-        {/* ── Pixel-art highlight blocks — prominent white squares, top-left zone ── */}
+        {/* ── Pixel highlight blocks — top-left sheen, like bunny sprites ── */}
         <g clipPath="url(#csc-clip)">
-          {/* Large main highlight block */}
-          <rect x="29" y="15" width="7"   height="7"   fill="white" opacity="0.70" />
-          {/* Medium highlight */}
-          <rect x="36" y="10" width="5"   height="5"   fill="white" opacity="0.50" />
-          {/* Small accent */}
-          <rect x="24" y="22" width="4"   height="4"   fill="white" opacity="0.35" />
-          {/* Tiny sparkle */}
-          <rect x="39" y="16" width="3"   height="3"   fill="white" opacity="0.25" />
-          {/* Right arm mid-shine */}
-          <rect x="72" y="38" width="4"   height="3"   fill="white" opacity="0.20" />
+          <rect x="30" y="13" width="7" height="5" fill="white" opacity="0.62" />
+          <rect x="36" y="9"  width="5" height="4" fill="white" opacity="0.45" />
+          <rect x="25" y="19" width="4" height="4" fill="white" opacity="0.30" />
+          <rect x="38" y="15" width="3" height="3" fill="white" opacity="0.22" />
+          <rect x="70" y="37" width="4" height="3" fill="white" opacity="0.16" />
         </g>
 
-        {/* ── Face ── */}
+        {/* ══ FACE ══ */}
 
         {sleeping ? (
 
-          /* Sleeping: wide soft dash-eyes, tiny mouth curve — "— —" */
-          <g opacity="0.90">
-            <rect x="33" y="48" width="13" height="3.5" rx="1.75" fill="#2d1400" />
-            <rect x="54" y="48" width="13" height="3.5" rx="1.75" fill="#2d1400" />
-            {/* Tiny sleeping blush circles */}
-            <ellipse cx="34" cy="58" rx="5.5" ry="3.5" fill="#ff9aaa" opacity="0.40" />
-            <ellipse cx="66" cy="58" rx="5.5" ry="3.5" fill="#ff9aaa" opacity="0.40" />
+          /* Sleeping: two small dash-lines (the classic — — pixel look) */
+          <g>
+            <rect x="37" y="49" width="7" height="2.5" rx="1.25" fill={PX_OUTLINE} opacity="0.88" />
+            <rect x="56" y="49" width="7" height="2.5" rx="1.25" fill={PX_OUTLINE} opacity="0.88" />
+            {/* Subtle blush even while sleeping */}
+            <ellipse cx="33" cy="57" rx="5"   ry="3"   fill="#FF88BB" opacity="0.35" />
+            <ellipse cx="67" cy="57" rx="5"   ry="3"   fill="#FF88BB" opacity="0.35" />
           </g>
 
         ) : (
 
           <g>
-            {/* LEFT eye — big round sclera, springs open on wake */}
-            <g style={waking ? { ...pivot, animation: "gift-eye-open 0.40s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}>
-              {/* Sclera — taller oval */}
-              <rect x="33" y="38" width="14" height="17" rx="7" fill="white" stroke="#2d1400" strokeWidth="1.8" />
-              {/* Pupil */}
-              <rect x="35.5" y="40.5" width="9" height="12" rx="3.5" fill="#2d1400" />
-              {/* Star-shaped glint: cross of two white rects */}
-              <rect x="40"   y="41.5" width="4"   height="1.5" fill="white" opacity="1" />
-              <rect x="41"   y="40.5" width="2"   height="3.5" fill="white" opacity="1" />
-              {/* Soft secondary glint (bottom-left of pupil) */}
-              <rect x="36.5" y="49.5" width="2.5" height="2.5" fill="white" opacity="0.50" />
+            {/* ── LEFT eye: compact dark square, single white glint ── */}
+            {/* No white sclera — the dark rect IS the eye (pixel-art style) */}
+            <g style={waking ? { ...pivot, animation: "gift-eye-open 0.38s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}>
+              <rect x="36" y="43" width="8" height="9" rx="2.5" fill={PX_OUTLINE} />
+              {/* Single bright glint — top-right corner of the eye */}
+              <rect x="41.5" y="44.5" width="2.5" height="2.5" fill="white" opacity="1" />
             </g>
 
-            {/* RIGHT eye — springs open then gives a cute wink */}
+            {/* ── RIGHT eye: springs open, then gives a cute wink ── */}
             <g style={waking ? { ...pivot, animation: "gift-wink 1.1s ease-in-out both" } : undefined}>
-              {/* Sclera */}
-              <rect x="53" y="38" width="14" height="17" rx="7" fill="white" stroke="#2d1400" strokeWidth="1.8" />
-              {/* Pupil */}
-              <rect x="55.5" y="40.5" width="9" height="12" rx="3.5" fill="#2d1400" />
-              {/* Star-shaped glint */}
-              <rect x="60"   y="41.5" width="4"   height="1.5" fill="white" opacity="1" />
-              <rect x="61"   y="40.5" width="2"   height="3.5" fill="white" opacity="1" />
-              {/* Soft secondary glint */}
-              <rect x="56.5" y="49.5" width="2.5" height="2.5" fill="white" opacity="0.50" />
+              <rect x="56" y="43" width="8" height="9" rx="2.5" fill={PX_OUTLINE} />
+              <rect x="61.5" y="44.5" width="2.5" height="2.5" fill="white" opacity="1" />
             </g>
 
-            {/* Tiny curved smile */}
+            {/* ── Tiny kawaii smile — narrow gentle curve ── */}
             <path
-              d="M 41,63 Q 50,69 59,63"
-              fill="none" stroke="#2d1400"
-              strokeWidth="2.6" strokeLinecap="round"
-              shapeRendering="geometricPrecision"
+              d="M 43,61 Q 50,66 57,61"
+              fill="none"
+              stroke={PX_OUTLINE}
+              strokeWidth="2.2"
+              strokeLinecap="round"
             />
 
-            {/* Soft round pink cheeks */}
-            <ellipse cx="33" cy="60" rx="6.5" ry="4.5" fill="#ff88aa" opacity="0.50" />
-            <ellipse cx="67" cy="60" rx="6.5" ry="4.5" fill="#ff88aa" opacity="0.50" />
+            {/* ── Soft pink cheek blush ── */}
+            <ellipse cx="32" cy="57" rx="5.5" ry="3.5" fill="#FF88BB" opacity="0.45" />
+            <ellipse cx="68" cy="57" rx="5.5" ry="3.5" fill="#FF88BB" opacity="0.45" />
           </g>
 
         )}

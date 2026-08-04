@@ -521,13 +521,15 @@ html, body {
   100% { opacity: 1; transform: scale(1);    filter: brightness(1);   }
 }
 
-/* 2. Star wakes up — hops upward, surges brighter, settles before launching */
+/* 2. Star wakes up — happy hop, then surges brighter and settles */
 @keyframes gift-wake {
   0%   { transform: scale(1)    translateY(  0px); filter: brightness(1);    }
-  35%  { transform: scale(1.18) translateY( -8px); filter: brightness(1.80); }
-  58%  { transform: scale(1.28) translateY(-14px); filter: brightness(2.55); }
-  78%  { transform: scale(1.20) translateY( -8px); filter: brightness(2.00); }
-  100% { transform: scale(1.12) translateY(  0px); filter: brightness(1.55); }
+  15%  { transform: scale(1.08) translateY(-12px); filter: brightness(1.40); }
+  32%  { transform: scale(1.16) translateY(-20px); filter: brightness(1.90); }  /* hop peak */
+  50%  { transform: scale(1.22) translateY( -6px); filter: brightness(2.40); }  /* land + surge */
+  65%  { transform: scale(1.20) translateY(  0px); filter: brightness(2.20); }  /* touch down */
+  78%  { transform: scale(1.15) translateY( -5px); filter: brightness(1.80); }  /* tiny bounce */
+  100% { transform: scale(1.10) translateY(  0px); filter: brightness(1.55); }  /* settle */
 }
 
 /* 2b. Left eye snaps open with a spring overshoot */
