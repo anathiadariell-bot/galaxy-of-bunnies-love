@@ -2,3 +2,4 @@
 - [Reconnecting Lovable app to user-owned Supabase](lovable-supabase-reconnect.md) — detecting Lovable-managed backends, env var naming, pooler vs direct connection, secure secret entry.
 - [Auth login redirect bug fix](auth-login-redirect-bug.md) — getUser() in beforeLoad causes redirect loops; use getSession() instead. OAuth needs a dedicated callback route.
 - [Living jar animation ownership](living-jar-animation-ownership.md) — Keep jar float, breathing, and arrival transforms on separate layers with one CSS definition each.
+- [Inspecting shallow Git imports](shallow-git-import-history.md) — Check remote tips and deepen history before describing commits missing from an imported shallow checkout.
