@@ -50,8 +50,12 @@ const TWINKLE_DOTS = [
 ];
 
 // Deterministic orbit sizes (px) and float-animation delays (s)
-const ORBIT_SIZES  = [34, 28, 38, 26, 32, 36, 24, 34, 28, 38, 26, 32];
-const FLOAT_DELAYS = [0.0, 1.3, 0.5, 2.1, 0.9, 1.7, 0.3, 2.5, 1.1, 1.6, 0.7, 2.3];
+const ORBIT_SIZES     = [34, 28, 38, 26, 32, 36, 24, 34, 28, 38, 26, 32];
+const FLOAT_DELAYS    = [0.0, 1.3, 0.5, 2.1, 0.9, 1.7, 0.3, 2.5, 1.1, 1.6, 0.7, 2.3];
+// Each orb bobs at its own rhythm (s) — varied so they never move in sync
+const FLOAT_DURATIONS = [5.2, 6.8, 5.8, 7.4, 6.2, 5.5, 7.0, 6.5, 5.0, 7.8, 6.1, 5.7];
+// Per-orb base offset for twinkle dot delays — staggers when each orb glints
+const TWINKLE_BASES   = [0.0, 0.4, 1.1, 0.2, 0.8, 1.5, 0.6, 1.2, 0.3, 1.0, 0.5, 1.8];
 
 /**
  * Compute (left%, top%) for orbit star `i` of `total`.

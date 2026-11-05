@@ -89,6 +89,8 @@ export function MemoryJar({ size = 420, className = "", glowLevel = 0 }: Props) 
       />
 
       {/* ── Floating jar sprite ── */}
+      {/* Breathing wrapper — gentle scale pulse giving the jar life */}
+      <div className="h-full w-full animate-jar-breathe" style={{ transformOrigin: "50% 64%" }}>
       <div className="relative h-full w-full animate-float-jar">
         <img
           src={jarImg}

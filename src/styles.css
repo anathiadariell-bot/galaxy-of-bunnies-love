@@ -405,8 +405,30 @@ html, body {
   100% { transform: scale(2.3);  opacity: 0; }
 }
 
+/* Jar breathing — very gentle continuous scale pulse on top of the float */
+@keyframes jar-breathe {
+  0%, 100% { transform: scale(1);     }
+  48%       { transform: scale(1.013); }
+}
+/* Jar entrance — springs into place when My Jar opens */
+@keyframes jar-enter {
+  0%   { opacity: 0; transform: scale(0.72);  }
+  58%  { opacity: 1; transform: scale(1.045); }
+  80%  { opacity: 1; transform: scale(0.983); }
+  100% { opacity: 1; transform: scale(1);     }
+}
+/* Orbit star entrance — each star pops in with an elastic spring */
+@keyframes star-enter {
+  0%   { opacity: 0; transform: scale(0.15) translateY(10px); }
+  62%  { opacity: 1; transform: scale(1.10) translateY(-3px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
 @utility animate-jar-arrival { animation: jar-arrival-pulse 1.25s cubic-bezier(0.34,1.56,0.64,1) both; }
-@utility animate-jar-bloom   { animation: jar-arrival-bloom 1.7s ease-out both; }
+@utility animate-jar-bloom   { animation: jar-arrival-bloom 1.7s  ease-out both; }
+@utility animate-jar-breathe { animation: jar-breathe       4.2s  ease-in-out infinite; }
+@utility animate-jar-enter   { animation: jar-enter         0.85s cubic-bezier(0.34,1.56,0.64,1) both; }
+@utility animate-star-enter  { animation: star-enter        0.65s cubic-bezier(0.34,1.56,0.64,1) both; }
 
 /* ════════════════════════════════════════════
    Theme variants
