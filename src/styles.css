@@ -524,15 +524,29 @@ html, body {
   100% { opacity: 1; transform: scale(1);    filter: brightness(1);   }
 }
 
-/* 2. Star wakes up — happy hop, then surges brighter and settles */
+/* A slow, restrained bob and sway keeps the pixel sprite crisp and gentle. */
+@keyframes gift-star-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25%      { transform: translate3d(1.5px, -5px, 0) rotate(0.35deg); }
+  50%      { transform: translate3d(0, -8px, 0) rotate(0deg); }
+  75%      { transform: translate3d(-1.5px, -4px, 0) rotate(-0.35deg); }
+}
+
+.gift-star-float {
+  animation: gift-star-drift 6.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gift-star-float { animation: none; }
+}
+
+/* 2. Star wakes with a soft buoyant lift instead of a sharp hop */
 @keyframes gift-wake {
-  0%   { transform: scale(1)    translateY(  0px); filter: brightness(1);    }
-  15%  { transform: scale(1.08) translateY(-12px); filter: brightness(1.40); }
-  32%  { transform: scale(1.16) translateY(-20px); filter: brightness(1.90); }  /* hop peak */
-  50%  { transform: scale(1.22) translateY( -6px); filter: brightness(2.40); }  /* land + surge */
-  65%  { transform: scale(1.20) translateY(  0px); filter: brightness(2.20); }  /* touch down */
-  78%  { transform: scale(1.15) translateY( -5px); filter: brightness(1.80); }  /* tiny bounce */
-  100% { transform: scale(1.10) translateY(  0px); filter: brightness(1.55); }  /* settle */
+  0%   { transform: scale(1)    translateY( 0px); filter: brightness(1);    }
+  30%  { transform: scale(1.04) translateY(-6px); filter: brightness(1.12); }
+  55%  { transform: scale(1.08) translateY(-10px); filter: brightness(1.24); }
+  78%  { transform: scale(1.05) translateY(-4px); filter: brightness(1.15); }
+  100% { transform: scale(1.03) translateY( 0px); filter: brightness(1.08); }
 }
 
 /* 2b. Left eye snaps open with a spring overshoot */
@@ -553,16 +567,27 @@ html, body {
   80%, 100% { transform: scaleY(1);    }
 }
 
-/* 3. Star sweeps a curved arc downward, rotating as it goes — like a little
-      character waddling through the air. filter starts at 1.5 to match where
-      gift-wake left off (avoids brightness flash on phase change). */
+/* 3. Star follows one broad, eased arc with only a small side-to-side drift. */
 @keyframes gift-arc {
-  0%   { transform: translate(  0px,  0  ) scale(1.12) rotate(  0deg); filter: brightness(1.5); }
-  14%  { transform: translate( 28px,  5vh) scale(1.07) rotate( 10deg); filter: brightness(1.3); }
-  35%  { transform: translate(-14px, 13vh) scale(1.00) rotate( -7deg); filter: brightness(1.1); }
-  58%  { transform: translate( 22px, 22vh) scale(0.93) rotate(  8deg); filter: brightness(1.0); }
-  82%  { transform: translate(  4px, 28vh) scale(0.95) rotate( -4deg); filter: brightness(1.0); }
-  100% { transform: translate(  0px, 30vh) scale(0.96) rotate(  0deg); filter: brightness(1.0); }
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.12) rotate(0deg);
+    filter: brightness(1.08);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  35% {
+    transform: translate3d(8px, 10vh, 0) scale(1.05) rotate(1deg);
+    filter: brightness(1.05);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  70% {
+    transform: translate3d(6px, 21vh, 0) scale(0.99) rotate(-0.5deg);
+    filter: brightness(1.02);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  100% {
+    transform: translate3d(0, 30vh, 0) scale(0.96) rotate(0deg);
+    filter: brightness(1);
+  }
 }
 
 /* 4. Flash burst when the star reaches the message */

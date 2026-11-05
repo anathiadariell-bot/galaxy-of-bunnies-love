@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Gift, Lock, Calendar, Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Gift, Lock, Calendar, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { CozyRoom } from "@/components/galaxy/CozyRoom";
 import { Header } from "@/components/galaxy/Header";
 import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
@@ -87,79 +87,29 @@ const TRAIL_DOTS = [
   { left: "calc(50% + 8px)",   top: "calc(50% + 28vh)", size: 2.0, delay: "0.95s" },
 ];
 
-// ─── StarOrb (same as send-gift) ─────────────────────────────────────────────
+// ─── Pixel-art gift star used on locked and missing-link states ───────────────
 
 function StarOrb({ color, size = 120 }: { color: string; size?: number }) {
-  // Architecture: replace the large circular orb div with a tiny bright-point core.
-  // The circle boundary of a large orb creates a visible disc because the CozyRoom
-  // background image shows through the transparent interior, contrasting with the
-  // exterior glow. A tiny core (20% of size) fades to transparent well inside its
-  // own border-radius — the circular boundary is invisible. All atmospheric presence
-  // comes from edgeless blurred gradient layers (no border-radius).
-  const core = Math.round(size * 0.2);         // 24 px — tiny bright point
-  const outerSpread = Math.round(size * 1.2);  // outer haze extends this far past the wrapper
-
   return (
     <div
-      className="animate-float-y"
+      className="gift-star-float"
       style={{ position: "relative", width: size, height: size, flexShrink: 0 }}
     >
-      {/* ── Outer atmospheric haze: no border-radius, large blur → completely edgeless ── */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: -outerSpread,
-          // Gradient does the shaping; blur dissolves any edge that might remain.
-          background: `radial-gradient(circle at 50% 50%, ${oa(color, 0.6)} 0%, ${oa(color, 0.3)} 18%, ${oa(color, 0.1)} 36%, ${oa(color, 0)} 55%)`,
-          filter: `blur(${Math.round(size * 0.95)}px)`,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* ── Inner bloom: tighter, less blurred — the "warm glow" zone ── */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: -Math.round(size * 0.35),
-          background: `radial-gradient(circle at 50% 50%, white 0%, ${color} 12%, ${oa(color, 0.35)} 30%, ${oa(color, 0)} 52%)`,
-          filter: `blur(${Math.round(size * 0.22)}px)`,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* ── Bright-point core: very small circle, fades to transparent at 75% of its own
-              radius — the circular clip is in a fully transparent zone, never perceptible ── */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: core, height: core,
-          borderRadius: "50%",
-          background: `radial-gradient(circle at 45% 42%, white 0%, white 18%, ${color} 48%, ${oa(color, 0)} 75%)`,
-          boxShadow: `0 0 5px 2px white, 0 0 10px ${color}`,
-          zIndex: 1,
-        }}
-      />
-
-      {/* ── Sparkles icon centered in the glow ── */}
-      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
-        <Sparkles style={{ width: size * 0.22, height: size * 0.22, color: "white", opacity: 0.8 }} />
-      </div>
-
-      {/* ── Twinkle dots scattered in the glow area ── */}
+      <CuteStarCharacter color={color} size={size} phase="arc" />
       {TWINKLE_DOTS.map((d, i) => (
         <span
           key={i}
-          className="absolute animate-twinkle rounded-full bg-white"
+          aria-hidden
+          className="pointer-events-none absolute animate-twinkle rounded-full bg-white"
           style={{
-            top: `${d.top}%`, left: `${d.left}%`,
-            width: d.size, height: d.size,
+            top: `${d.top}%`,
+            left: `${d.left}%`,
+            width: d.size,
+            height: d.size,
             animationDelay: `${d.delay}s`,
             opacity: 0.85,
             zIndex: 2,
+            boxShadow: `0 0 8px ${oa(color, 0.65)}`,
           }}
         />
       ))}
@@ -193,24 +143,165 @@ function Shell({ color, children }: { color: string; children: React.ReactNode }
   );
 }
 
-// ─── CuteStarCharacter — genuine kawaii pixel-art star sprite ─────────────────
+// ─── CuteStarCharacter — fixed-grid pixel sprite with a soft halo ──────────────
 //
-// Design principles matching the reference:
-//   • Fixed warm golden body (#FFD44A) — always golden regardless of gift colour
-//   • Compact polygon R=40,r=22 with integer coordinates for a blocky pixel feel
-//   • Thin dark-brown outline (2.2px) — not thick cartoon strokes
-//   • Pixel-art eyes: small dark rounded rects (~8×9) with a tiny 2×2 white glint,
-//     NO visible white sclera background (pixel-art sprites don't have white ovals)
-//   • Sleeping: two tiny dash rects; waking: left eye opens, right eye winks
-//   • Minimal soft glow (single layer, ~30% of old size) so character reads clearly
-//   • Solid pixel highlight blocks + subtle body gradient for volume
+// The gold body, one-cell dark outline, square eyes, pixel smile, and block blush
+// are drawn on a 28×26 grid so the silhouette stays deliberate and crisp.
 
 // Star body colours — always golden, independent of gift colour
-const PX_FILL    = "#FFD44A";   // warm golden body
-const PX_OUTLINE = "#3D1E00";   // dark warm-brown outline & face
+const PX_OUTLINE = "#3B291E";
+const PX_GOLD = "#FFDF4B";
+const PX_GOLD_LIGHT = "#FFE96B";
+const PX_GOLD_SHADE = "#F4C63F";
+const PX_CHEEK = "#F29A78";
+const PX_GLINT = "#FFF6D8";
 
-// R=40, r=22, centre (50,50), integer-snapped for a blocky pixel-art silhouette
-const STAR_POINTS = "50,8 63,30 88,36 71,55 74,80 50,70 26,80 29,55 12,36 37,30";
+// Each row lists inclusive x-spans. The bottom split and broad side points are
+// intentional parts of the silhouette, not randomly scattered pixels.
+const STAR_SILHOUETTE: [number, number][][] = [
+  [[13, 14]],
+  [[12, 15]],
+  [[11, 16]],
+  [[10, 17]],
+  [[9, 18]],
+  [[9, 18]],
+  [[8, 19]],
+  [[8, 19]],
+  [[7, 20]],
+  [[6, 21]],
+  [[5, 22]],
+  [[3, 24]],
+  [[1, 26]],
+  [[0, 27]],
+  [[0, 27]],
+  [[1, 26]],
+  [[2, 25]],
+  [[3, 24]],
+  [[4, 23]],
+  [[5, 22]],
+  [[5, 22]],
+  [[6, 21]],
+  [[6, 21]],
+  [
+    [6, 11],
+    [16, 21],
+  ],
+  [
+    [6, 10],
+    [17, 21],
+  ],
+  [
+    [6, 9],
+    [18, 21],
+  ],
+];
+
+const STAR_PIXEL_CELLS = (() => {
+  const filled = new Set<string>();
+  STAR_SILHOUETTE.forEach((segments, y) => {
+    segments.forEach(([start, end]) => {
+      for (let x = start; x <= end; x += 1) filled.add(`${x},${y}`);
+    });
+  });
+
+  const cells: Array<{ x: number; y: number; fill: string }> = [];
+  STAR_SILHOUETTE.forEach((segments, y) => {
+    segments.forEach(([start, end]) => {
+      for (let x = start; x <= end; x += 1) {
+        const isOutline = [
+          [x - 1, y],
+          [x + 1, y],
+          [x, y - 1],
+          [x, y + 1],
+        ].some(([neighborX, neighborY]) => !filled.has(`${neighborX},${neighborY}`));
+        const isHighlight = !isOutline && y >= 4 && y <= 6 && x >= 10 && x <= 13;
+        const isLowerShade = !isOutline && y >= 20 && (x <= 8 || x >= 19);
+        cells.push({
+          x,
+          y,
+          fill: isOutline
+            ? PX_OUTLINE
+            : isHighlight
+              ? PX_GOLD_LIGHT
+              : isLowerShade
+                ? PX_GOLD_SHADE
+                : PX_GOLD,
+        });
+      }
+    });
+  });
+  return cells;
+})();
+
+function PixelStarArtwork({
+  size,
+  phase,
+}: {
+  size: number;
+  phase: Exclude<OpenPhase, "card" | "revealed">;
+}) {
+  const sleeping = phase === "intro";
+  const waking = phase === "wake";
+  const pivot: React.CSSProperties = {
+    transformBox: "fill-box",
+    transformOrigin: "center",
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 28 26"
+      shapeRendering="crispEdges"
+      style={{ position: "relative", zIndex: 1, overflow: "visible", imageRendering: "pixelated" }}
+      aria-hidden
+    >
+      {STAR_PIXEL_CELLS.map(({ x, y, fill }) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill={fill} />
+      ))}
+
+      <rect x="6" y="15" width="3" height="3" fill={PX_CHEEK} />
+      <rect x="19" y="15" width="3" height="3" fill={PX_CHEEK} />
+
+      {sleeping ? (
+        <g fill={PX_OUTLINE}>
+          <rect x="8" y="13" width="2" height="1" />
+          <rect x="18" y="13" width="2" height="1" />
+        </g>
+      ) : (
+        <>
+          <g
+            style={
+              waking
+                ? { ...pivot, animation: "gift-eye-open 0.38s cubic-bezier(0.34,1.56,0.64,1) both" }
+                : undefined
+            }
+          >
+            <rect x="8" y="12" width="2" height="3" fill={PX_OUTLINE} />
+            <rect x="8" y="12" width="1" height="1" fill={PX_GLINT} />
+          </g>
+          <g
+            style={
+              waking
+                ? { ...pivot, animation: "gift-wink 1.1s ease-in-out both" }
+                : undefined
+            }
+          >
+            <rect x="18" y="12" width="2" height="3" fill={PX_OUTLINE} />
+            <rect x="18" y="12" width="1" height="1" fill={PX_GLINT} />
+          </g>
+        </>
+      )}
+
+      <g fill={PX_OUTLINE}>
+        <rect x="12" y="15" width="1" height="1" />
+        <rect x="13" y="16" width="1" height="1" />
+        <rect x="14" y="16" width="1" height="1" />
+        <rect x="15" y="15" width="1" height="1" />
+      </g>
+    </svg>
+  );
+}
 
 function CuteStarCharacter({
   color,
@@ -224,15 +315,9 @@ function CuteStarCharacter({
   const sleeping = phase === "intro";
   const waking   = phase === "wake";
 
-  // scaleY wink/open needs transform-origin at the element's own centre
-  const pivot: React.CSSProperties = {
-    transformBox:    "fill-box",
-    transformOrigin: "center",
-  };
-
   return (
     <div
-      className={sleeping || waking ? "animate-float-y" : undefined}
+      className={sleeping || waking ? "gift-star-float" : undefined}
       style={{ position: "relative", width: size, height: size }}
     >
       {/* ── Single soft ambient glow — much smaller than before ── */}
@@ -277,98 +362,7 @@ function CuteStarCharacter({
         </svg>
       )}
 
-      {/* ── Pixel-art star SVG ── */}
-      <svg
-        width={size} height={size}
-        viewBox="0 0 100 100"
-        shapeRendering="crispEdges"
-        style={{ position: "relative", zIndex: 1, overflow: "visible" }}
-        aria-hidden
-      >
-        <defs>
-          {/* Clip everything to the star silhouette */}
-          <clipPath id="csc-clip">
-            <polygon points={STAR_POINTS} />
-          </clipPath>
-          {/* Subtle body gradient: brighter top-left, deeper golden bottom */}
-          <radialGradient id="csc-body" cx="38%" cy="34%" r="68%" gradientUnits="objectBoundingBox">
-            <stop offset="0%"   stopColor="#FFE870" />
-            <stop offset="55%"  stopColor="#FFD44A" />
-            <stop offset="100%" stopColor="#F0A800" />
-          </radialGradient>
-        </defs>
-
-        {/* ── Star body ── */}
-        <polygon
-          points={STAR_POINTS}
-          fill="url(#csc-body)"
-          stroke={PX_OUTLINE}
-          strokeWidth="2.2"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          paintOrder="stroke"
-        />
-
-        {/* ── Bottom shadow strip (pixel-art depth) ── */}
-        <rect x="0" y="56" width="100" height="44"
-          fill="#8B5200" opacity="0.18"
-          clipPath="url(#csc-clip)" />
-
-        {/* ── Pixel highlight blocks — top-left sheen, like bunny sprites ── */}
-        <g clipPath="url(#csc-clip)">
-          <rect x="30" y="13" width="7" height="5" fill="white" opacity="0.62" />
-          <rect x="36" y="9"  width="5" height="4" fill="white" opacity="0.45" />
-          <rect x="25" y="19" width="4" height="4" fill="white" opacity="0.30" />
-          <rect x="38" y="15" width="3" height="3" fill="white" opacity="0.22" />
-          <rect x="70" y="37" width="4" height="3" fill="white" opacity="0.16" />
-        </g>
-
-        {/* ══ FACE ══ */}
-
-        {sleeping ? (
-
-          /* Sleeping: two small dash-lines (the classic — — pixel look) */
-          <g>
-            <rect x="37" y="49" width="7" height="2.5" rx="1.25" fill={PX_OUTLINE} opacity="0.88" />
-            <rect x="56" y="49" width="7" height="2.5" rx="1.25" fill={PX_OUTLINE} opacity="0.88" />
-            {/* Subtle blush even while sleeping */}
-            <ellipse cx="33" cy="57" rx="5"   ry="3"   fill="#FF88BB" opacity="0.35" />
-            <ellipse cx="67" cy="57" rx="5"   ry="3"   fill="#FF88BB" opacity="0.35" />
-          </g>
-
-        ) : (
-
-          <g>
-            {/* ── LEFT eye: compact dark square, single white glint ── */}
-            {/* No white sclera — the dark rect IS the eye (pixel-art style) */}
-            <g style={waking ? { ...pivot, animation: "gift-eye-open 0.38s cubic-bezier(0.34,1.56,0.64,1) both" } : undefined}>
-              <rect x="36" y="43" width="8" height="9" rx="2.5" fill={PX_OUTLINE} />
-              {/* Single bright glint — top-right corner of the eye */}
-              <rect x="41.5" y="44.5" width="2.5" height="2.5" fill="white" opacity="1" />
-            </g>
-
-            {/* ── RIGHT eye: springs open, then gives a cute wink ── */}
-            <g style={waking ? { ...pivot, animation: "gift-wink 1.1s ease-in-out both" } : undefined}>
-              <rect x="56" y="43" width="8" height="9" rx="2.5" fill={PX_OUTLINE} />
-              <rect x="61.5" y="44.5" width="2.5" height="2.5" fill="white" opacity="1" />
-            </g>
-
-            {/* ── Tiny kawaii smile — narrow gentle curve ── */}
-            <path
-              d="M 43,61 Q 50,66 57,61"
-              fill="none"
-              stroke={PX_OUTLINE}
-              strokeWidth="2.2"
-              strokeLinecap="round"
-            />
-
-            {/* ── Soft pink cheek blush ── */}
-            <ellipse cx="32" cy="57" rx="5.5" ry="3.5" fill="#FF88BB" opacity="0.45" />
-            <ellipse cx="68" cy="57" rx="5.5" ry="3.5" fill="#FF88BB" opacity="0.45" />
-          </g>
-
-        )}
-      </svg>
+      <PixelStarArtwork size={size} phase={phase} />
     </div>
   );
 }
@@ -388,11 +382,18 @@ function GiftIntroOverlay({
   phase: Exclude<OpenPhase, "card" | "revealed">;
   color: string;
 }) {
-  const starAnimation =
-    phase === "intro" ? "gift-appear 0.7s cubic-bezier(0.34,1.56,0.64,1) both" :
-    phase === "wake"  ? "gift-wake 1.1s ease-in-out both" :
-    phase === "arc"   ? "gift-arc 1.4s cubic-bezier(0.25,0.46,0.45,0.94) forwards" :
-    /* burst — star hidden, particles take over */ "";
+  const starAnimation = (() => {
+    switch (phase) {
+      case "intro":
+        return "gift-appear 0.7s cubic-bezier(0.34,1.56,0.64,1) both";
+      case "wake":
+        return "gift-wake 1.1s ease-in-out both";
+      case "arc":
+        return "gift-arc 1.4s linear forwards";
+      case "burst":
+        return "";
+    }
+  })();
 
   return (
     <div
