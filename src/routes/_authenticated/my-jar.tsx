@@ -9,6 +9,8 @@ import { MemoryJar } from "@/components/galaxy/MemoryJar";
 import { useStars } from "@/hooks/useGalaxyData";
 import type { Star } from "@/hooks/useGalaxyData";
 import { STAR_COLORS, type StarColor, EMOTIONS } from "@/lib/galaxy";
+import bunnyHer from "@/assets/bunny-her-pixel.png";
+import bunnyHim from "@/assets/bunny-him-pixel.png";
 
 export const Route = createFileRoute("/_authenticated/my-jar")({
   head: () => ({
@@ -74,6 +76,9 @@ function getOrbitPos(i: number, total: number) {
 
 // ─── StarOrb ───────────────────────────────────────────────────────────────────
 
+// Orbit star float-animation variants — cycled by star index for organic variety
+const FLOAT_ANIMS = ["animate-float-y", "animate-float-y-b", "animate-float-y-c"] as const;
+
 /**
  * Glowing, floating star orb used in both the jar orbit and the modal preview.
  */
@@ -82,12 +87,14 @@ function StarOrb({
   size = 32,
   delay = 0,
   float = true,
+  floatClass = "animate-float-y",
   onClick,
 }: {
   color: string;
   size?: number;
   delay?: number;
   float?: boolean;
+  floatClass?: string;
   onClick?: () => void;
 }) {
   const Tag = onClick ? "button" : "div";
@@ -96,7 +103,7 @@ function StarOrb({
       {...(onClick ? { onClick, "aria-label": "Open memory" } : {})}
       className={[
         "rounded-full",
-        float ? "animate-float-y" : "",
+        float ? floatClass : "",
         onClick ? "cursor-pointer transition-transform hover:scale-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" : "",
       ].join(" ")}
       style={{
@@ -128,6 +135,90 @@ function StarOrb({
         />
       ))}
     </Tag>
+  );
+}
+
+// ─── Bunny celebration ─────────────────────────────────────────────────────────
+
+// Deterministic particle set — no Math.random, SSR-safe.
+// --cpx drives per-particle horizontal drift (set as inline CSS var).
+const CELEBRATE_PARTICLES = [
+  { cpx: "-14px", delay: 0.00, symbol: "♥", color: "oklch(0.82 0.15 8)"   },
+  { cpx:  "16px", delay: 0.12, symbol: "✦", color: "oklch(0.92 0.16 90)"  },
+  { cpx:  "-7px", delay: 0.24, symbol: "♥", color: "oklch(0.88 0.13 350)" },
+  { cpx:  "22px", delay: 0.08, symbol: "✦", color: "oklch(0.85 0.10 240)" },
+  { cpx: "-20px", delay: 0.32, symbol: "♥", color: "oklch(0.86 0.13 82)"  },
+  { cpx:   "8px", delay: 0.18, symbol: "✦", color: "oklch(0.87 0.11 290)" },
+] as const;
+
+/**
+ * Bunny sprite that idles normally and does a one-shot joyful jump (with
+ * floating hearts/sparkles) whenever `isArriving` flips to true.
+ * The sprite image is never modified — only CSS transforms are applied.
+ */
+function BunnyReaction({
+  src,
+  side,
+  isArriving,
+  idleClass,
+}: {
+  src: string;
+  side: "left" | "right";
+  isArriving: boolean;
+  idleClass: string;
+}) {
+  const jumpClass =
+    side === "left" ? "animate-bunny-happy-jump" : "animate-bunny-happy-jump-r";
+
+  return (
+    <div
+      className="pointer-events-none absolute select-none"
+      style={{
+        [side]: "3%",
+        bottom: "5%",
+        width: "clamp(50px, 9%, 72px)",
+        zIndex: 5,
+      }}
+    >
+      {/* Floating hearts & sparkles — only rendered during arrival */}
+      {isArriving && CELEBRATE_PARTICLES.map((p, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="animate-bunny-celebrate absolute left-1/2 bottom-full -translate-x-1/2"
+          style={{
+            "--cpx": p.cpx,
+            animationDelay: `${p.delay}s`,
+            fontSize: "clamp(9px, 1.4vw, 14px)",
+            color: p.color,
+            lineHeight: 1,
+            filter:    `drop-shadow(0 0 3px ${p.color})`,
+            textShadow: `0 0 6px ${p.color}`,
+            whiteSpace: "nowrap",
+          } as React.CSSProperties}
+        >
+          {p.symbol}
+        </span>
+      ))}
+
+      {/* Bunny sprite — same asset as dashboard, only animation class changes */}
+      <img
+        src={src}
+        alt=""
+        aria-hidden
+        className={isArriving ? jumpClass : idleClass}
+        style={{
+          imageRendering: "pixelated",
+          width: "100%",
+          filter: [
+            "drop-shadow(2px 2px 0px oklch(0.08 0.03 255 / 0.75))",
+            "drop-shadow(0 0 14px oklch(0.90 0.15 78 / 0.42))",
+            "drop-shadow(0 0 6px oklch(0.74 0.09 8 / 0.22))",
+          ].join(" "),
+        }}
+      />
+
+    </div>
   );
 }
 
@@ -168,8 +259,8 @@ function JarScene({
 
       {/* Jar — z-10 so lower-arc stars (z-20) render in front */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ zIndex: 10 }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-jar-enter"
+        style={{ zIndex: 10, animationDelay: "0.1s" }}
       >
         {/* Arrival bloom — radiates outward when a new star lands */}
         {isArriving && (
@@ -192,15 +283,31 @@ function JarScene({
         </div>
       </div>
 
+      {/* ── Bunny reactions — flank the jar, jump when a star arrives ── */}
+      <BunnyReaction
+        src={bunnyHer}
+        side="left"
+        isArriving={isArriving}
+        idleClass="animate-bunny-idle"
+      />
+      <BunnyReaction
+        src={bunnyHim}
+        side="right"
+        isArriving={isArriving}
+        idleClass="animate-bunny-idle-r"
+      />
+
       {/* Orbiting stars */}
       {stars.map((s, i) => {
         const pos = getOrbitPos(i, total);
         const color = STAR_COLORS[s.color as StarColor] ?? STAR_COLORS.gold;
-        const size = ORBIT_SIZES[i % ORBIT_SIZES.length];
+        const orbSize = ORBIT_SIZES[i % ORBIT_SIZES.length];
         const delay = FLOAT_DELAYS[i % FLOAT_DELAYS.length];
         // Stars in lower half of orbit are "in front" of the jar
         const topPct = parseFloat(pos.top);
         const zIndex = topPct >= 49 ? 20 : 8;
+        // Stagger entrance: first star at 0.22s, each subsequent +0.06s
+        const enterDelay = (0.22 + i * 0.06).toFixed(2);
 
         return (
           <div
@@ -213,12 +320,19 @@ function JarScene({
               zIndex,
             }}
           >
-            <StarOrb
-              color={color}
-              size={size}
-              delay={delay}
-              onClick={() => onStarClick(s)}
-            />
+            {/* Entrance wrapper — pops in on mount, then hands off to the float animation */}
+            <div
+              className="animate-orbit-star-enter"
+              style={{ animationDelay: `${enterDelay}s` }}
+            >
+              <StarOrb
+                color={color}
+                size={orbSize}
+                delay={delay}
+                floatClass={FLOAT_ANIMS[i % FLOAT_ANIMS.length]}
+                onClick={() => onStarClick(s)}
+              />
+            </div>
           </div>
         );
       })}

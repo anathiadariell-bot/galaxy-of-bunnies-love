@@ -17,13 +17,20 @@ export const PLAN_LIMITS = {
     maxStars: 15,
     maxLetters: 10,
     allowedThemes: ["night"] as Theme[],
+    /** Date lock + PIN lock on gift stars — free plan cannot use these. */
+    giftLocks: false,
   },
   premium: {
     maxStars: Infinity,
     maxLetters: Infinity,
     allowedThemes: [...ALL_THEMES] as Theme[],
+    /** Date lock + PIN lock on gift stars — both enabled on premium. */
+    giftLocks: true,
   },
-} as const satisfies Record<Plan, { maxStars: number; maxLetters: number; allowedThemes: Theme[] }>;
+} as const satisfies Record<
+  Plan,
+  { maxStars: number; maxLetters: number; allowedThemes: Theme[]; giftLocks: boolean }
+>;
 
 /** Human-readable label for each plan. */
 export const PLAN_LABELS: Record<Plan, string> = {
@@ -61,4 +68,17 @@ export function starLimitMessage(plan: Plan | null | undefined): string {
 export function letterLimitMessage(plan: Plan | null | undefined): string {
   const { maxLetters } = getLimits(plan);
   return `You've reached your ${maxLetters}-letter limit on the Free plan. Upgrade to Premium for unlimited love letters. ✨`;
+}
+
+/**
+ * Returns true when the user's plan allows gift lock features
+ * (date lock and PIN lock on gift stars).
+ */
+export function canUseGiftLocks(plan: Plan | null | undefined): boolean {
+  return getLimits(plan).giftLocks;
+}
+
+/** Returns a friendly message explaining why gift locks require an upgrade. */
+export function giftLocksMessage(): string {
+  return "Date locks and PIN locks on gift stars are a Premium feature. Upgrade to keep your messages sealed until just the right moment. ✨";
 }

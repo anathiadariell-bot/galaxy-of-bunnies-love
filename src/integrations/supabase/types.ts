@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      gift_replies: {
+        Row: {
+          color: string
+          created_at: string
+          emotion: string
+          from_name: string
+          gift_star_id: string
+          id: string
+          message: string
+          reply_token: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          emotion?: string
+          from_name: string
+          gift_star_id: string
+          id?: string
+          message: string
+          reply_token?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          emotion?: string
+          from_name?: string
+          gift_star_id?: string
+          id?: string
+          message?: string
+          reply_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_replies_gift_star_id_fkey"
+            columns: ["gift_star_id"]
+            isOneToOne: true
+            referencedRelation: "gift_stars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_stars: {
+        Row: {
+          color: string
+          created_at: string
+          emotion: string
+          id: string
+          message: string
+          pin_hash: string | null
+          sender_id: string
+          sender_name: string
+          share_token: string
+          to_name: string
+          unlock_at: string | null
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          emotion?: string
+          id?: string
+          message: string
+          pin_hash?: string | null
+          sender_id: string
+          sender_name: string
+          share_token?: string
+          to_name: string
+          unlock_at?: string | null
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          emotion?: string
+          id?: string
+          message?: string
+          pin_hash?: string | null
+          sender_id?: string
+          sender_name?: string
+          share_token?: string
+          to_name?: string
+          unlock_at?: string | null
+        }
+        Relationships: []
+      }
       letters: {
         Row: {
           body: string
@@ -118,7 +201,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      gift_stars_public: {
+        Row: {
+          color: string
+          created_at: string
+          emotion: string
+          has_pin_lock: boolean
+          id: string
+          message: string
+          sender_name: string
+          share_token: string
+          to_name: string
+          unlock_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

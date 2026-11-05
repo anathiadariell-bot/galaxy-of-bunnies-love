@@ -14,9 +14,11 @@ import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GiftTokenRouteImport } from './routes/gift.$token'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedThemesRouteImport } from './routes/_authenticated/themes'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSendGiftRouteImport } from './routes/_authenticated/send-gift'
 import { Route as AuthenticatedMyJarRouteImport } from './routes/_authenticated/my-jar'
 import { Route as AuthenticatedLoveLettersRouteImport } from './routes/_authenticated/love-letters'
 import { Route as AuthenticatedGalaxyModeRouteImport } from './routes/_authenticated/galaxy-mode'
@@ -49,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GiftTokenRoute = GiftTokenRouteImport.update({
+  id: '/gift/$token',
+  path: '/gift/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
@@ -62,6 +69,11 @@ const AuthenticatedThemesRoute = AuthenticatedThemesRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSendGiftRoute = AuthenticatedSendGiftRouteImport.update({
+  id: '/send-gift',
+  path: '/send-gift',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMyJarRoute = AuthenticatedMyJarRouteImport.update({
@@ -114,9 +126,11 @@ export interface FileRoutesByFullPath {
   '/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
   '/love-letters': typeof AuthenticatedLoveLettersRoute
   '/my-jar': typeof AuthenticatedMyJarRoute
+  '/send-gift': typeof AuthenticatedSendGiftRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/gift/$token': typeof GiftTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -130,9 +144,11 @@ export interface FileRoutesByTo {
   '/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
   '/love-letters': typeof AuthenticatedLoveLettersRoute
   '/my-jar': typeof AuthenticatedMyJarRoute
+  '/send-gift': typeof AuthenticatedSendGiftRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/gift/$token': typeof GiftTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -148,9 +164,11 @@ export interface FileRoutesById {
   '/_authenticated/galaxy-mode': typeof AuthenticatedGalaxyModeRoute
   '/_authenticated/love-letters': typeof AuthenticatedLoveLettersRoute
   '/_authenticated/my-jar': typeof AuthenticatedMyJarRoute
+  '/_authenticated/send-gift': typeof AuthenticatedSendGiftRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/themes': typeof AuthenticatedThemesRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
+  '/gift/$token': typeof GiftTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -166,9 +184,11 @@ export interface FileRouteTypes {
     | '/galaxy-mode'
     | '/love-letters'
     | '/my-jar'
+    | '/send-gift'
     | '/settings'
     | '/themes'
     | '/timeline'
+    | '/gift/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -182,9 +202,11 @@ export interface FileRouteTypes {
     | '/galaxy-mode'
     | '/love-letters'
     | '/my-jar'
+    | '/send-gift'
     | '/settings'
     | '/themes'
     | '/timeline'
+    | '/gift/$token'
   id:
     | '__root__'
     | '/'
@@ -199,9 +221,11 @@ export interface FileRouteTypes {
     | '/_authenticated/galaxy-mode'
     | '/_authenticated/love-letters'
     | '/_authenticated/my-jar'
+    | '/_authenticated/send-gift'
     | '/_authenticated/settings'
     | '/_authenticated/themes'
     | '/_authenticated/timeline'
+    | '/gift/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +234,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  GiftTokenRoute: typeof GiftTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -249,6 +274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gift/$token': {
+      id: '/gift/$token'
+      path: '/gift/$token'
+      fullPath: '/gift/$token'
+      preLoaderRoute: typeof GiftTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/timeline': {
       id: '/_authenticated/timeline'
       path: '/timeline'
@@ -268,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/send-gift': {
+      id: '/_authenticated/send-gift'
+      path: '/send-gift'
+      fullPath: '/send-gift'
+      preLoaderRoute: typeof AuthenticatedSendGiftRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my-jar': {
@@ -330,6 +369,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGalaxyModeRoute: typeof AuthenticatedGalaxyModeRoute
   AuthenticatedLoveLettersRoute: typeof AuthenticatedLoveLettersRoute
   AuthenticatedMyJarRoute: typeof AuthenticatedMyJarRoute
+  AuthenticatedSendGiftRoute: typeof AuthenticatedSendGiftRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedThemesRoute: typeof AuthenticatedThemesRoute
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
@@ -343,6 +383,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGalaxyModeRoute: AuthenticatedGalaxyModeRoute,
   AuthenticatedLoveLettersRoute: AuthenticatedLoveLettersRoute,
   AuthenticatedMyJarRoute: AuthenticatedMyJarRoute,
+  AuthenticatedSendGiftRoute: AuthenticatedSendGiftRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedThemesRoute: AuthenticatedThemesRoute,
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
@@ -357,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  GiftTokenRoute: GiftTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
