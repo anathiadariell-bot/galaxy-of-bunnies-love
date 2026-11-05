@@ -88,6 +88,8 @@ function StarOrb({
   delay = 0,
   float = true,
   floatClass = "animate-float-y",
+  floatDuration,
+  twinkleOffset = 0,
   onClick,
 }: {
   color: string;
@@ -95,6 +97,8 @@ function StarOrb({
   delay?: number;
   float?: boolean;
   floatClass?: string;
+  floatDuration?: number;
+  twinkleOffset?: number;
   onClick?: () => void;
 }) {
   const Tag = onClick ? "button" : "div";
@@ -110,6 +114,7 @@ function StarOrb({
         width: size,
         height: size,
         animationDelay: `${delay}s`,
+        animationDuration: floatDuration ? `${floatDuration}s` : undefined,
         background: `radial-gradient(circle at 38% 32%, white 0%, ${color} 38%, ${color}88 80%)`,
         boxShadow: [
           `0 0 ${Math.round(size * 0.5)}px ${color}`,
@@ -129,7 +134,7 @@ function StarOrb({
             left: `${d.left}%`,
             width: Math.max(1, size * 0.065),
             height: Math.max(1, size * 0.065),
-            animationDelay: `${d.delay}s`,
+            animationDelay: `${d.delay + twinkleOffset}s`,
             opacity: 0.85,
           }}
         />
@@ -330,6 +335,8 @@ function JarScene({
                 size={orbSize}
                 delay={delay}
                 floatClass={FLOAT_ANIMS[i % FLOAT_ANIMS.length]}
+                floatDuration={FLOAT_DURATIONS[i % FLOAT_DURATIONS.length]}
+                twinkleOffset={TWINKLE_BASES[i % TWINKLE_BASES.length]}
                 onClick={() => onStarClick(s)}
               />
             </div>
