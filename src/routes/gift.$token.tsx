@@ -388,7 +388,7 @@ function GiftIntroOverlay({
       case "wake":
         return "gift-wake 1.1s ease-in-out both";
       case "arc":
-        return "gift-arc 1.4s cubic-bezier(0.45, 0, 0.55, 1) forwards";
+        return "";
       case "burst":
         return "";
     }
@@ -410,9 +410,9 @@ function GiftIntroOverlay({
         <div style={{ position: "absolute", top: "50%", left: "50%" }}>
           {/* Centering: aligns the 120 × 120 character centre with the anchor */}
           <div style={{ transform: "translate(-50%, -50%)" }}>
-            {/* Vertical travel stays separate from the star's smooth lateral flight curve. */}
+            {/* One transform carries the unchanged flight path to avoid nested-transform shimmer. */}
             <div style={{ animation: starAnimation }}>
-              <div className={phase === "arc" ? "gift-arc-sway" : undefined}>
+              <div className={phase === "arc" ? "gift-arc-flight" : undefined}>
                 <CuteStarCharacter color={color} size={120} phase={phase} />
               </div>
             </div>

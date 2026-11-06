@@ -567,40 +567,34 @@ html, body {
   80%, 100% { transform: scaleY(1);    }
 }
 
-/* 3. The flight has one uninterrupted vertical easing and a separate,
-      continuous sine-driven S-curve. Keeping lateral travel on an inner
-      wrapper avoids transform conflicts and leaves the pixel sprite untouched. */
+/* 3. Drive the same eased S-curve and vertical travel through one transform.
+      The constant scale avoids animated pixel resampling during the flight. */
 @property --gift-flight-progress {
   syntax: "<number>";
   inherits: false;
   initial-value: 0;
 }
 
-.gift-arc-sway {
+.gift-arc-flight {
   --gift-flight-progress: 0;
   --gift-flight-amplitude: clamp(36px, 12vw, 64px);
   transform: translate3d(
-    calc(var(--gift-flight-amplitude) * sin(var(--gift-flight-progress) * 1turn)),
-    0,
+    calc(
+      var(--gift-flight-amplitude)
+      * sin(var(--gift-flight-progress) * 1turn)
+      * (1.12 - 0.16 * var(--gift-flight-progress))
+    ),
+    calc(30vh * var(--gift-flight-progress)),
     0
-  );
-  animation: gift-arc-sway 1.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  ) scale(1.04);
+  filter: brightness(calc(1.08 - 0.08 * var(--gift-flight-progress)));
+  animation: gift-arc-flight 1.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  will-change: transform;
 }
 
-@keyframes gift-arc-sway {
+@keyframes gift-arc-flight {
   from { --gift-flight-progress: 0; }
   to   { --gift-flight-progress: 1; }
-}
-
-@keyframes gift-arc {
-  from {
-    transform: translate3d(0, 0, 0) scale(1.12);
-    filter: brightness(1.08);
-  }
-  to {
-    transform: translate3d(0, 30vh, 0) scale(0.96);
-    filter: brightness(1);
-  }
 }
 
 /* 4. Flash burst when the star reaches the message */
