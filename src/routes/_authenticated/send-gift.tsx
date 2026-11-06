@@ -283,10 +283,21 @@ function SendGiftPage() {
   const charsLeft     = msgLimit - message.length;
   const overLimit     = charsLeft < 0;
 
+  function promptPremiumPin() {
+    toast("PIN protection is Premium 🔒", {
+      description: "Upgrade to Premium to add a PIN to your Gift Star. ✨",
+    });
+  }
+
   // ── Submit ────────────────────────────────────────────────────────────────
 
   async function handleSend() {
     if (!user) return;
+
+    if (!canLock && pin.trim()) {
+      promptPremiumPin();
+      return;
+    }
 
     const errors: string[] = [];
     if (!fromName.trim()) errors.push("Your name is required.");
@@ -698,6 +709,17 @@ function SendGiftPage() {
               <p className="max-w-xs text-sm text-foreground/50">
                 {giftLocksMessage()}
               </p>
+              <button
+                type="button"
+                onClick={promptPremiumPin}
+                className="flex w-full items-center justify-between rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-left transition-colors hover:bg-primary/10"
+              >
+                <span className="flex items-center gap-2 text-sm font-medium text-foreground/75">
+                  <Lock size={14} />
+                  Unlock by PIN
+                </span>
+                <span className="text-xs font-semibold text-primary">🔐 Premium</span>
+              </button>
             </div>
           )}
         </Section>
