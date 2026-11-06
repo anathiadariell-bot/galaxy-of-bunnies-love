@@ -75,16 +75,15 @@ const BURST_PARTICLES = Array.from({ length: 12 }, (_, i) => {
   };
 });
 
-// Trail dots: overlay-absolute positions matching the arc keyframe waypoints.
-// Arc: (50%, 50%) → (+28px,+5vh) → (-14px,+13vh) → (+22px,+22vh) → (0,+30vh)
+// Trail dots trace the same broad S-curve as the star's continuous flight.
 const TRAIL_DOTS = [
-  { left: "calc(50% + 14px)",  top: "calc(50% + 4vh)",  size: 4.0, delay: "0.00s" },
-  { left: "calc(50% + 22px)",  top: "calc(50% + 8vh)",  size: 2.5, delay: "0.20s" },
-  { left: "calc(50% + 6px)",   top: "calc(50% + 12vh)", size: 4.5, delay: "0.35s" },
-  { left: "calc(50% - 10px)",  top: "calc(50% + 16vh)", size: 3.0, delay: "0.50s" },
-  { left: "calc(50% + 4px)",   top: "calc(50% + 20vh)", size: 2.5, delay: "0.65s" },
-  { left: "calc(50% + 18px)",  top: "calc(50% + 24vh)", size: 3.5, delay: "0.80s" },
-  { left: "calc(50% + 8px)",   top: "calc(50% + 28vh)", size: 2.0, delay: "0.95s" },
+  { left: "calc(50% + 34px)", top: "calc(50% + 4vh)",  size: 4.0, delay: "0.00s" },
+  { left: "calc(50% + 43px)", top: "calc(50% + 8vh)",  size: 2.5, delay: "0.16s" },
+  { left: "calc(50% + 28px)", top: "calc(50% + 12vh)", size: 4.5, delay: "0.32s" },
+  { left: "calc(50% - 9px)",  top: "calc(50% + 16vh)", size: 3.0, delay: "0.48s" },
+  { left: "calc(50% - 36px)", top: "calc(50% + 20vh)", size: 2.5, delay: "0.64s" },
+  { left: "calc(50% - 43px)", top: "calc(50% + 24vh)", size: 3.5, delay: "0.80s" },
+  { left: "calc(50% - 18px)", top: "calc(50% + 28vh)", size: 2.0, delay: "0.96s" },
 ];
 
 // ─── Pixel-art gift star used on locked and missing-link states ───────────────
@@ -389,7 +388,7 @@ function GiftIntroOverlay({
       case "wake":
         return "gift-wake 1.1s ease-in-out both";
       case "arc":
-        return "gift-arc 1.4s linear forwards";
+        return "gift-arc 1.4s cubic-bezier(0.45, 0, 0.55, 1) forwards";
       case "burst":
         return "";
     }
@@ -411,9 +410,11 @@ function GiftIntroOverlay({
         <div style={{ position: "absolute", top: "50%", left: "50%" }}>
           {/* Centering: aligns the 120 × 120 character centre with the anchor */}
           <div style={{ transform: "translate(-50%, -50%)" }}>
-            {/* Motion: animation translates/rotates from (0,0) = centred position */}
+            {/* Vertical travel stays separate from the star's smooth lateral flight curve. */}
             <div style={{ animation: starAnimation }}>
-              <CuteStarCharacter color={color} size={120} phase={phase} />
+              <div className={phase === "arc" ? "gift-arc-sway" : undefined}>
+                <CuteStarCharacter color={color} size={120} phase={phase} />
+              </div>
             </div>
           </div>
         </div>
