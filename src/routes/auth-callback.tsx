@@ -24,28 +24,9 @@ function AuthCallbackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // ── TEMPORARY DIAGNOSTICS — remove after debugging ──────────────────────
-    console.error('[auth-callback] URL on mount:', window.location.href);
-    const urlParams = new URLSearchParams(window.location.search);
-    console.error('[auth-callback] ?code present:', urlParams.has('code'));
-    console.error('[auth-callback] ?error:', urlParams.get('error'));
-    console.error('[auth-callback] ?error_description:', urlParams.get('error_description'));
-    console.error('[auth-callback] code-verifier in localStorage:',
-      localStorage.getItem('supabase.auth.token-code-verifier'));
-
-    // Explicitly call exchangeCodeForSession to surface the exact error.
-    const code = urlParams.get('code');
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
-        console.error('[auth-callback] exchangeCodeForSession result — error:', error, 'session:', data?.session?.user?.email ?? null);
-      });
-    }
-    // ── END TEMPORARY DIAGNOSTICS ────────────────────────────────────────────
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[auth-callback] onAuthStateChange event:', event, 'has session:', !!session);
       if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
         // SIGNED_IN  — normal path: code exchange completed after we subscribed.
         // INITIAL_SESSION with a session — code exchange completed before we
