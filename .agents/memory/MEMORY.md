@@ -3,3 +3,4 @@
 - [Auth login redirect bug fix](auth-login-redirect-bug.md) — getUser() in beforeLoad causes redirect loops; use getSession() instead. OAuth needs a dedicated callback route.
 - [Living jar animation ownership](living-jar-animation-ownership.md) — Keep jar float, breathing, and arrival transforms on separate layers with one CSS definition each.
 - [Inspecting shallow Git imports](shallow-git-import-history.md) — Check remote tips and deepen history before describing commits missing from an imported shallow checkout.
+- [Secret requests and `.replit`](secret-request-replit-config.md) — Verify `.replit` after secure secret requests; remove any plaintext entries and rotate exposed credentials.
