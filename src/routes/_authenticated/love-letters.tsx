@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Mail, Lock, Send } from "lucide-react";
 import { PageShell } from "@/components/galaxy/PageShell";
@@ -7,7 +7,9 @@ import { ThemeBoot } from "@/components/galaxy/ThemeBoot";
 import { GlassCard } from "@/components/galaxy/GlassCard";
 import { EmptyState } from "@/components/galaxy/EmptyState";
 import { UpgradeBanner } from "@/components/galaxy/UpgradeBanner";
+import { ButterflyLetterReveal } from "@/components/galaxy/ButterflyLetterReveal";
 import { useCreateLetter, useLetters, useLetterLimit } from "@/hooks/useGalaxyData";
+import { getLetterOpeningMode, LETTER_REVEAL_DURATION_MS } from "@/lib/love-letter-opening";
 
 export const Route = createFileRoute("/_authenticated/love-letters")({
   head: () => ({
@@ -42,17 +44,32 @@ function LoveLettersPage() {
         unlock_at: unlockAt ? new Date(unlockAt).toISOString() : null,
       });
       toast.success("Letter sealed with love 💌");
-      setTitle(""); setBody(""); setUnlockAt("");
+      setTitle("");
+      setBody("");
+      setUnlockAt("");
     } catch (err) {
       toast.error("Couldn't seal this letter", { description: (err as Error).message });
     }
   };
 
   const [openId, setOpenId] = useState<string | null>(null);
+  const [revealingId, setRevealingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!revealingId) return;
+
+    const timeout = window.setTimeout(() => {
+      setOpenId(revealingId);
+      setRevealingId(null);
+    }, LETTER_REVEAL_DURATION_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [revealingId]);
 
   return (
     <>
       <ThemeBoot />
+      {revealingId && <ButterflyLetterReveal />}
       <PageShell
         eyebrow="Love Letters"
         title="Words for the future you"
@@ -64,18 +81,18 @@ function LoveLettersPage() {
             {/* Limit counter pill */}
             {!isLoading && max !== Infinity && (
               <div className="flex justify-end">
-                <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  allowed ? "bg-white/10 text-foreground/60" : "bg-primary/20 text-primary"
-                }`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    allowed ? "bg-white/10 text-foreground/60" : "bg-primary/20 text-primary"
+                  }`}
+                >
                   {count} / {max} letters used
                 </span>
               </div>
             )}
 
             {/* Upgrade banner when limit is reached */}
-            {!isLoading && !allowed && reason && (
-              <UpgradeBanner message={reason} />
-            )}
+            {!isLoading && !allowed && reason && <UpgradeBanner message={reason} />}
 
             <form onSubmit={submit}>
               <GlassCard strong>
@@ -94,7 +111,9 @@ function LoveLettersPage() {
                   />
                 </label>
                 <label className="mt-4 block">
-                  <span className="text-xs uppercase tracking-widest text-foreground/70">Message</span>
+                  <span className="text-xs uppercase tracking-widest text-foreground/70">
+                    Message
+                  </span>
                   <textarea
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
@@ -105,7 +124,9 @@ function LoveLettersPage() {
                   />
                 </label>
                 <label className="mt-4 block">
-                  <span className="text-xs uppercase tracking-widest text-foreground/70">Open on (optional)</span>
+                  <span className="text-xs uppercase tracking-widest text-foreground/70">
+                    Open on (optional)
+                  </span>
                   <input
                     type="date"
                     value={unlockAt}
@@ -120,7 +141,8 @@ function LoveLettersPage() {
                   className="font-elegant mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg text-primary-foreground transition hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   style={{ background: "var(--gradient-primary)" }}
                 >
-                  <Send className="h-4 w-4 not-italic" /> {create.isPending ? "Sealing…" : "Seal with love"}
+                  <Send className="h-4 w-4 not-italic" />{" "}
+                  {create.isPending ? "Sealing…" : "Seal with love"}
                 </button>
               </GlassCard>
             </form>
@@ -137,16 +159,19 @@ function LoveLettersPage() {
             ) : (
               <div className="grid gap-4">
                 {letters.map((l, i) => {
-                  const locked = l.unlock_at ? new Date(l.unlock_at).getTime() > Date.now() : false;
+                  const locked = getLetterOpeningMode(l.unlock_at) === "locked";
                   const isOpen = openId === l.id;
                   return (
                     <GlassCard key={l.id} delay={i * 0.05} className="p-6">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <h3 className="truncate font-display text-2xl text-primary text-glow">{l.title}</h3>
+                          <h3 className="truncate font-display text-2xl text-primary text-glow">
+                            {l.title}
+                          </h3>
                           <p className="font-elegant mt-1 text-sm text-foreground/60">
                             Sealed {new Date(l.created_at).toLocaleDateString()}
-                            {l.unlock_at && ` · Opens ${new Date(l.unlock_at).toLocaleDateString()}`}
+                            {l.unlock_at &&
+                              ` · Opens ${new Date(l.unlock_at).toLocaleDateString()}`}
                           </p>
                         </div>
                         {locked ? (
@@ -155,7 +180,30 @@ function LoveLettersPage() {
                           </span>
                         ) : (
                           <button
-                            onClick={() => setOpenId(isOpen ? null : l.id)}
+                            onClick={() => {
+                              if (isOpen) {
+                                setOpenId(null);
+                                return;
+                              }
+
+                              const prefersReducedMotion = window.matchMedia(
+                                "(prefers-reduced-motion: reduce)",
+                              ).matches;
+                              const openingMode = getLetterOpeningMode(
+                                l.unlock_at,
+                                Date.now(),
+                                prefersReducedMotion,
+                              );
+
+                              if (openingMode === "locked") return;
+                              if (openingMode === "reveal") {
+                                setRevealingId(l.id);
+                                return;
+                              }
+
+                              setOpenId(l.id);
+                            }}
+                            aria-expanded={isOpen}
                             className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
                           >
                             {isOpen ? "Close" : "Open"}
@@ -163,7 +211,9 @@ function LoveLettersPage() {
                         )}
                       </div>
                       {isOpen && !locked && (
-                        <p className="font-elegant mt-4 whitespace-pre-wrap text-base text-foreground/85 animate-reveal">{l.body}</p>
+                        <p className="font-elegant mt-4 whitespace-pre-wrap text-base text-foreground/85 animate-reveal">
+                          {l.body}
+                        </p>
                       )}
                     </GlassCard>
                   );

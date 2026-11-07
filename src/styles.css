@@ -365,6 +365,162 @@ html, body {
 @utility animate-bunny-idle     { animation: bunny-idle   5.8s ease-in-out infinite; }
 @utility animate-bunny-idle-r   { animation: bunny-idle-r 6.4s ease-in-out infinite; }
 
+/* ── Date-scheduled Love Letter reveal ── */
+.letter-reveal-overlay {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 44%, oklch(0.36 0.12 285 / 0.62), transparent 44%),
+    oklch(0.10 0.04 275 / 0.97);
+  animation: letter-reveal-backdrop 500ms ease-out both;
+}
+
+.letter-reveal-stage {
+  min-height: 100svh;
+}
+
+.letter-reveal-jar {
+  animation: letter-reveal-jar 850ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.letter-reveal-bloom {
+  width: min(60vw, 420px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(0.85 0.14 290 / 0.44), oklch(0.82 0.14 340 / 0.16) 42%, transparent 72%);
+  filter: blur(12px);
+  transform: translate(-50%, -50%) scale(0.25);
+  animation: letter-reveal-bloom 2.8s ease-out 250ms both;
+}
+
+.letter-reveal-butterfly {
+  position: absolute;
+  z-index: 20;
+  top: calc(50% - 119px);
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  opacity: 0;
+  image-rendering: pixelated;
+  offset-anchor: center;
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+  animation: letter-butterfly-flight 2.55s cubic-bezier(0.32, 0.58, 0.4, 1) both;
+}
+
+.letter-reveal-butterfly-sprite {
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-repeat: no-repeat;
+  background-size: 384px 48px;
+  image-rendering: pixelated;
+  animation: letter-reveal-wing-flap 420ms steps(1, end) infinite;
+}
+
+.letter-reveal-sprite--pink {
+  --wing-open: 0px;
+  --wing-folded: -48px;
+}
+
+.letter-reveal-sprite--gold {
+  --wing-open: -96px;
+  --wing-folded: -144px;
+}
+
+.letter-reveal-sprite--lavender {
+  --wing-open: -192px;
+  --wing-folded: -240px;
+}
+
+.letter-reveal-sprite--mint {
+  --wing-open: -288px;
+  --wing-folded: -336px;
+}
+
+.letter-reveal-flight--northwest {
+  offset-path: path("M 0 0 C -70 -70, -260 -210, -520 -390");
+}
+
+.letter-reveal-flight--northeast {
+  offset-path: path("M 0 0 C 70 -70, 260 -210, 520 -390");
+}
+
+.letter-reveal-flight--west {
+  offset-path: path("M 0 0 C -100 -45, -300 55, -540 -45");
+}
+
+.letter-reveal-flight--east {
+  offset-path: path("M 0 0 C 100 45, 300 -55, 540 55");
+}
+
+.letter-reveal-flight--southwest {
+  offset-path: path("M 0 0 C -65 75, -250 220, -500 370");
+}
+
+.letter-reveal-flight--southeast {
+  offset-path: path("M 0 0 C 75 65, 260 210, 520 380");
+}
+
+.letter-reveal-caption {
+  top: calc(50% + 190px);
+  opacity: 0;
+  animation: letter-reveal-caption 700ms ease-out 550ms both;
+}
+
+@keyframes letter-reveal-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes letter-reveal-jar {
+  0% { opacity: 0; transform: translateY(16px) scale(0.92); filter: brightness(0.7); }
+  65% { opacity: 1; transform: translateY(-3px) scale(1.015); filter: brightness(1.18); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+
+@keyframes letter-reveal-bloom {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.25); }
+  38% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.55); }
+}
+
+@keyframes letter-reveal-wing-flap {
+  0%, 45% { background-position: var(--wing-open) 0; }
+  50%, 95% { background-position: var(--wing-folded) 0; }
+  100% { background-position: var(--wing-open) 0; }
+}
+
+@keyframes letter-reveal-caption {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes letter-butterfly-flight {
+  0% { opacity: 0; offset-distance: 0%; }
+  12% { opacity: 1; }
+  100% { opacity: 0; offset-distance: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-reveal-overlay,
+  .letter-reveal-jar,
+  .letter-reveal-bloom,
+  .letter-reveal-butterfly,
+  .letter-reveal-butterfly-sprite,
+  .letter-reveal-caption {
+    animation: none !important;
+  }
+
+  .letter-reveal-bloom,
+  .letter-reveal-butterfly {
+    display: none;
+  }
+
+  .letter-reveal-caption {
+    opacity: 1;
+  }
+}
+
 /* ── Star movement variants (more organic orbit feel) ── */
 /* float-y-b: diagonal drift with gentle rotation */
 @keyframes float-y-b {
