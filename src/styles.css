@@ -272,6 +272,64 @@ html, body {
   0%, 100% { box-shadow: 0 0 16px oklch(0.86 0.13 82 / 0.2); }
   50%      { box-shadow: 0 0 32px oklch(0.86 0.13 82 / 0.5); }
 }
+@keyframes achievement-pixel-burst {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.35); }
+  18%  { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--pixel-x), var(--pixel-y)) scale(0.65); }
+}
+
+.achievement-card-unlocked {
+  border-color: oklch(0.86 0.13 82 / 0.48);
+  background-image: linear-gradient(135deg, oklch(0.86 0.13 82 / 0.1), transparent 68%);
+  box-shadow: 0 0 18px oklch(0.86 0.13 82 / 0.25);
+}
+
+.achievement-unlocked-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid oklch(0.86 0.13 82 / 0.42);
+  border-radius: 9999px;
+  background: oklch(0.86 0.13 82 / 0.12);
+  padding: 0.15rem 0.5rem;
+  color: oklch(0.9 0.13 90);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.achievement-pixel-burst {
+  position: absolute;
+  top: 1.65rem;
+  right: 2.1rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.achievement-pixel {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+  image-rendering: pixelated;
+  animation: achievement-pixel-burst 850ms steps(4, end) both;
+}
+
+.achievement-pixel:nth-child(1) { --pixel-x: -18px; --pixel-y: -16px; background: oklch(0.9 0.13 90); }
+.achievement-pixel:nth-child(2) { --pixel-x: 13px;  --pixel-y: -22px; background: oklch(0.85 0.13 20); animation-delay: 55ms; }
+.achievement-pixel:nth-child(3) { --pixel-x: 20px;  --pixel-y: 4px;   background: oklch(0.82 0.13 300); animation-delay: 90ms; }
+.achievement-pixel:nth-child(4) { --pixel-x: -12px; --pixel-y: 15px;  background: oklch(0.9 0.13 90); animation-delay: 35ms; }
+.achievement-pixel:nth-child(5) { --pixel-x: 2px;   --pixel-y: -30px; background: oklch(0.85 0.1 240); animation-delay: 70ms; }
+.achievement-pixel:nth-child(6) { --pixel-x: 25px;  --pixel-y: -13px; background: oklch(0.85 0.13 20); animation-delay: 115ms; }
+
+.achievement-grid-reduced-motion .animate-reveal {
+  animation: none !important;
+  opacity: 1;
+  transform: none;
+  transition: none !important;
+}
+
 @keyframes parallax-drift {
   0%, 100% { transform: translate(0, 0); }
   50%      { transform: translate(8px, -12px); }
@@ -502,6 +560,22 @@ html, body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .achievement-pixel-burst,
+  .achievement-card-unlocked.animate-badge-glow {
+    animation: none !important;
+  }
+
+  .achievement-pixel-burst {
+    display: none !important;
+  }
+
+  .achievement-grid .animate-reveal {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+
   .letter-reveal-overlay,
   .letter-reveal-jar,
   .letter-reveal-bloom,
